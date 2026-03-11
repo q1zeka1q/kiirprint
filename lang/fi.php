@@ -1,0 +1,33 @@
+<?php
+$lang = [
+    'menu_home' => 'Etusivu',
+    'menu_products' => 'Tuotteet',
+    'menu_requirements' => 'Aineisto-ohjeet',
+    'menu_contact' => 'Yhteystiedot',
+    'header_promo' => 'NOPEAT JA LAADUKKAAT PAINOTUOTTEET SUORAAN VALMISTAJALTA',
+    'products_title' => 'Tuotteemme',
+    'products_subtitle' => 'Valitse kategoria nähdäksesi lisätietoja ja laskeaksesi hinnan.',
+    'view_all' => 'Kaikki tuotteet',
+    'view_product' => 'Katso tuote',
+    'no_products' => 'Tuotteita ei ole vielä lisätty.',
+    'product_not_found' => 'Tuotetta ei löytynyt',
+    'ask_quote_title' => 'Pyydä tarjous',
+    'ask_quote_text' => 'Tälle tuotteelle laskemme hinnan yksilöllisesti toiveidesi mukaan.',
+    'form_title' => 'Jätä viesti tai pyydä tarjous',
+    'form_email' => 'Sähköpostisi *',
+    'form_subject' => 'Aihe *',
+    'form_message' => 'Viesti *',
+    'form_send' => 'LÄHETÄ PYYNTÖ',
+    'footer_contacts' => 'Yhteystiedot',
+    'footer_links' => 'Pikalinkit',
+    'footer_rights' => 'Kaikki oikeudet pidätetään.',
+    'contact_page_title' => 'Ota yhteyttä',
+    'contact_success' => 'Kiitos! Viestisi on lähetetty. Vastaamme mahdollisimman pian.',
+    'contact_info_title' => 'Yhteystiedot',
+    'contact_form_desc' => 'Pyydä tarjous tai jätä meille viesti. Vastaamme muutaman tunnin kuluessa arkipäivisin.',
+    'contact_phone' => 'Puhelin:',
+    'contact_address' => 'Osoite:',
+    'contact_bank_details' => 'Pankkitiedot:',
+    'contact_hours_label' => 'Aukioloajat:'
+];
+?>

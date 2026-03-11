@@ -1,0 +1,33 @@
+<?php
+$lang = [
+    'menu_home' => 'Avaleht',
+    'menu_products' => 'Tooted',
+    'menu_requirements' => 'Nõuded failidele',
+    'menu_contact' => 'Kontaktid',
+    'header_promo' => 'KIIRED JA KVALITEETSED TRÜKISED OTSE TOOTJALT',
+    'products_title' => 'Meie Tooted',
+    'products_subtitle' => 'Valige sobiv kategooria, et näha täpsemat infot ja arvutada hind.',
+    'view_all' => 'Kõik tooted',
+    'view_product' => 'Vaata toodet',
+    'no_products' => 'Tooteid pole veel lisatud.',
+    'product_not_found' => 'Toodet ei leitud',
+    'ask_quote_title' => 'Küsi pakkumist',
+    'ask_quote_text' => 'Selle toote puhul arvutame hinna personaalselt, vastavalt sinu soovidele.',
+    'form_title' => 'Jäta teade või küsi hinda',
+    'form_email' => 'Sinu E-post *',
+    'form_subject' => 'Teema *',
+    'form_message' => 'Sõnum *',
+    'form_send' => 'SAADA PÄRING',
+    'footer_contacts' => 'Kontaktid',
+    'footer_links' => 'Kiirlingid',
+    'footer_rights' => 'Kõik õigused kaitstud.',
+    'contact_page_title' => 'Võta meiega ühendust',
+    'contact_success' => 'Aitäh! Teie kiri on saadetud. Vastame esimesel võimalusel.',
+    'contact_info_title' => 'Kontaktandmed',
+    'contact_form_desc' => 'Küsi hinnapakkumist või jäta meile teade. Vastame tööpäeviti mõne tunni jooksul.',
+    'contact_phone' => 'Telefon:',
+    'contact_address' => 'Aadress:',
+    'contact_bank_details' => 'Pangarekvisiidid:',
+    'contact_hours_label' => 'Lahtiolekuajad:'
+];
+?>

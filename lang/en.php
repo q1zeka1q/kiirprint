@@ -1,0 +1,33 @@
+<?php
+$lang = [
+    'menu_home' => 'Home',
+    'menu_products' => 'Products',
+    'menu_requirements' => 'File Requirements',
+    'menu_contact' => 'Contact',
+    'header_promo' => 'FAST AND HIGH-QUALITY PRINTING DIRECTLY FROM THE MANUFACTURER',
+    'products_title' => 'Our Products',
+    'products_subtitle' => 'Select a category to see more details and calculate the price.',
+    'view_all' => 'All products',
+    'view_product' => 'View product',
+    'no_products' => 'No products added yet.',
+    'product_not_found' => 'Product not found',
+    'ask_quote_title' => 'Ask for a quote',
+    'ask_quote_text' => 'For this product, we calculate the price individually according to your wishes.',
+    'form_title' => 'Leave a message or request a quote',
+    'form_email' => 'Your E-mail *',
+    'form_subject' => 'Subject *',
+    'form_message' => 'Message *',
+    'form_send' => 'SEND INQUIRY',
+    'footer_contacts' => 'Contact Us',
+    'footer_links' => 'Quick Links',
+    'footer_rights' => 'All rights reserved.',
+    'contact_page_title' => 'Contact Us',
+    'contact_success' => 'Thank you! Your message has been sent. We will reply as soon as possible.',
+    'contact_info_title' => 'Contact Information',
+    'contact_form_desc' => 'Ask for a quote or leave us a message. We reply within a few hours on business days.',
+    'contact_phone' => 'Phone:',
+    'contact_address' => 'Address:',
+    'contact_bank_details' => 'Bank details:',
+    'contact_hours_label' => 'Opening hours:'
+];
+?>

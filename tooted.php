@@ -1,0 +1,215 @@
+<?php 
+require_once 'includes/config.php';
+
+// Страховочный массив на случай, если словари еще не полностью заполнены
+if (!isset($lang)) {
+    $lang = [
+        'menu_home' => 'Avaleht',
+        'menu_products' => 'Tooted',
+        'products_title' => 'Meie Tooted',
+        'products_subtitle' => 'Valige sobiv kategooria, et näha täpsemat infot ja arvutada hind.',
+        'view_product' => 'Vaata tooteid',
+        'no_products' => 'Tooteid pole veel lisatud.'
+    ];
+}
+
+include 'includes/header.php'; 
+
+$services_res = $conn->query("SELECT * FROM services WHERE is_visible = 1 ORDER BY id DESC");
+?>
+
+<main class="main-content">
+    
+    <section class="page-header-section">
+        <div class="container">
+            <div class="breadcrumbs">
+                <a href="index.php"><?= htmlspecialchars($lang['menu_home']) ?></a> <i class="fas fa-chevron-right"></i> 
+                <span><?= htmlspecialchars($lang['menu_products']) ?></span>
+            </div>
+
+            <h1 class="page-title"><?= htmlspecialchars($lang['products_title']) ?></h1>
+            <p class="page-subtitle"><?= htmlspecialchars($lang['products_subtitle']) ?></p>
+        </div>
+    </section>
+
+    <section class="section-white">
+        <div class="container">
+            <div class="cards-grid">
+                
+                <?php if ($services_res && $services_res->num_rows > 0): ?>
+                    <?php while($service = $services_res->fetch_assoc()): 
+                        
+                        // --- УМНАЯ ЛОГИКА ДЛЯ ТОВАРОВ ---
+                        $lang_suffix = ($current_lang == 'et') ? '' : '_' . $current_lang;
+                        // Если перевод есть - берем его, если пусто - берем эстонский
+                        $display_title = !empty($service['title' . $lang_suffix]) ? $service['title' . $lang_suffix] : $service['title'];
+                        // --------------------------------
+                    ?>
+                        
+                        <a href="tooted/toode.php?id=<?php echo $service['id']; ?>" class="modern-card">
+                            <div class="image-wrapper">
+                                <?php if(!empty($service['image_url'])): ?>
+                                    <img src="img/<?php echo htmlspecialchars($service['image_url']); ?>" alt="<?php echo htmlspecialchars($display_title); ?>">
+                                <?php else: ?>
+                                    <img src="img/placeholder.png" alt="No image">
+                                <?php endif; ?>
+                            </div>
+                            <div class="card-info">
+                                <h3><?php echo htmlspecialchars(mb_strtoupper($display_title)); ?></h3>
+                                <span class="more-link"><?= htmlspecialchars($lang['view_product']) ?> <i class="fas fa-arrow-right"></i></span>
+                            </div>
+                        </a>
+
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <p style="text-align:center; color:#888; grid-column: 1/-1; padding: 40px;"><?= htmlspecialchars($lang['no_products']) ?></p>
+                <?php endif; ?>
+
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<style>
+/* ОБЩИЕ СЕКЦИИ */
+body { background: #fcfcfc; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* ШАПКА СТРАНИЦЫ */
+.page-header-section { 
+    background-color: #f8fafc; 
+    padding: 100px 0 60px 0; 
+    border-bottom: 1px solid #edf2f7; 
+}
+.breadcrumbs { 
+    margin-bottom: 20px; 
+    font-size: 14px; 
+    color: #a0aec0; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.breadcrumbs a { color: #f36f21; text-decoration: none; font-weight: 600; transition: 0.2s; }
+.breadcrumbs a:hover { color: #d95d16; }
+.breadcrumbs i { font-size: 10px; }
+.breadcrumbs span { color: #4a5568; font-weight: 500; }
+
+.page-title { 
+    color: #2d3748; 
+    font-size: 2.8rem; 
+    margin: 0 0 15px 0; 
+    font-weight: 900; 
+    letter-spacing: -0.5px; 
+    position: relative;
+    padding-bottom: 15px;
+}
+.page-title::after { 
+    content: ""; 
+    position: absolute; 
+    left: 0; 
+    bottom: 0; 
+    width: 60px; 
+    height: 4px; 
+    background: #f36f21; 
+    border-radius: 2px; 
+}
+.page-subtitle { 
+    color: #718096; 
+    font-size: 1.15rem; 
+    margin: 0; 
+    line-height: 1.6;
+}
+
+/* CARDS GRID (Сетка) */
+.section-white { background-color: #ffffff; padding: 80px 0; min-height: 50vh;}
+.cards-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+    gap: 40px; 
+    justify-content: center; 
+}
+
+/* ДИЗАЙН КАРТОЧКИ (как на главной) */
+.modern-card { 
+    background: #fff; 
+    border-radius: 16px; 
+    border: 1px solid #edf2f7; 
+    text-decoration: none; 
+    transition: all 0.4s ease; 
+    overflow: hidden; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+    display: flex;
+    flex-direction: column;
+}
+.modern-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
+    border-color: #f36f21; 
+}
+.image-wrapper { 
+    height: 240px; 
+    padding: 30px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    background: #fff; 
+    overflow: hidden;
+}
+.image-wrapper img { 
+    max-height: 100%; 
+    max-width: 100%; 
+    object-fit: contain; 
+    transition: transform 0.5s ease;
+}
+/* Эффект зума картинки при наведении */
+.modern-card:hover .image-wrapper img {
+    transform: scale(1.05);
+}
+
+.card-info { 
+    padding: 25px; 
+    text-align: center; 
+    background: #f8fafc; 
+    border-top: 1px solid #edf2f7; 
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.card-info h3 { 
+    margin: 0 0 15px 0; 
+    color: #2d3748; 
+    font-size: 1.25rem; 
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+.more-link { 
+    color: #f36f21; 
+    font-weight: 700; 
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+/* Движение стрелочки при наведении */
+.modern-card:hover .more-link {
+    gap: 12px; 
+}
+
+/* МОБИЛЬНАЯ АДАПТАЦИЯ */
+@media (max-width: 768px) {
+    .page-header-section { padding: 80px 0 40px 0; text-align: center; }
+    .page-title { font-size: 2.2rem; }
+    .page-title::after { left: 50%; transform: translateX(-50%); }
+    .breadcrumbs { justify-content: center; }
+    
+    .section-white { padding: 50px 0; }
+    .cards-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+}
+</style>
+
+<?php include 'includes/footer.php'; ?>
