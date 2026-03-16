@@ -131,6 +131,7 @@ $current_desc = isset($s[$col_desc]) ? $s[$col_desc] : '';
                         <option value="visiitkaardid" <?= $current_type == 'visiitkaardid' ? 'selected' : '' ?>>Visiitkaardid</option>
                         <option value="flaierid" <?= $current_type == 'flaierid' ? 'selected' : '' ?>>Flaierid</option>
                         <option value="voldikud" <?= $current_type == 'voldikud' ? 'selected' : '' ?>>Voldikud</option>
+                        <option value="plakatid" <?= $current_type == 'plakatid' ? 'selected' : '' ?>>Plakatid</option>
                     </select>
                 </div>
 
