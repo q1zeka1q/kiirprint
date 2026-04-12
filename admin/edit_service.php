@@ -18,7 +18,6 @@ $edit_lang = isset($_SESSION['edit_lang']) ? $_SESSION['edit_lang'] : 'et';
 $col_title = ($edit_lang == 'et') ? 'title' : 'title_' . $edit_lang;
 $col_desc = ($edit_lang == 'et') ? 'description' : 'description_' . $edit_lang;
 
-// Если перевода еще нет, показываем пустое поле (или эстонский текст для ориентира)
 $current_title = isset($s[$col_title]) ? $s[$col_title] : '';
 $current_desc = isset($s[$col_desc]) ? $s[$col_desc] : '';
 ?>
@@ -29,6 +28,8 @@ $current_desc = isset($s[$col_desc]) ? $s[$col_desc] : '';
     <meta charset="UTF-8">
     <title>Muuda teenust | <?= htmlspecialchars($s['title']) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.0.1/classic/ckeditor.js"></script>
+
     <style>
         :root {
             --main-orange: #f36f21;
@@ -65,9 +66,16 @@ $current_desc = isset($s[$col_desc]) ? $s[$col_desc] : '';
 
         .form-group { display: flex; flex-direction: column; }
         label.input-title { font-size: 13px; font-weight: 700; color: #4a5568; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input[type="text"], textarea, select { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e0; border-radius: 6px; font-family: inherit; font-size: 14px; background: #fff; transition: 0.2s; box-sizing: border-box; color: #1a202c;}
-        input:focus, textarea:focus, select:focus { border-color: var(--main-orange); outline: none; box-shadow: 0 0 0 3px rgba(243, 111, 33, 0.15); }
-        textarea { height: 120px; resize: vertical; line-height: 1.5; }
+        input[type="text"], select { width: 100%; padding: 12px 15px; border: 1px solid #cbd5e0; border-radius: 6px; font-family: inherit; font-size: 14px; background: #fff; transition: 0.2s; box-sizing: border-box; color: #1a202c;}
+        
+        /* Стили для редактора */
+        .ck-editor__editable {
+            min-height: 250px;
+            border-radius: 0 0 6px 6px !important;
+        }
+        .ck-focused {
+            border-color: var(--main-orange) !important;
+        }
 
         .custom-file-upload { border: 1px solid #cbd5e0; display: inline-flex; align-items: center; gap: 8px; padding: 12px 15px; cursor: pointer; border-radius: 6px; background: #f8fafc; color: #4a5568; font-size: 14px; font-weight: 600; transition: 0.2s; width: fit-content; }
         .custom-file-upload:hover { background: #edf2f7; border-color: #a0aec0; }
@@ -105,9 +113,6 @@ $current_desc = isset($s[$col_desc]) ? $s[$col_desc] : '';
                 <div class="form-group">
                     <label class="input-title">Teenuse nimetus (<?= strtoupper($edit_lang) ?>)</label>
                     <input type="text" name="title" value="<?= htmlspecialchars($current_title) ?>" placeholder="Sisesta tõlge..." required>
-                    <?php if($edit_lang != 'et' && empty($current_title)): ?>
-                        <small style="color:#718096; margin-top:5px;">Originaal (EST): <?= htmlspecialchars($s['title']) ?></small>
-                    <?php endif; ?>
                 </div>
 
                 <div class="form-group">
@@ -117,26 +122,25 @@ $current_desc = isset($s[$col_desc]) ? $s[$col_desc] : '';
 
                 <div class="form-group full-width">
                     <label class="input-title">Pikk kirjeldus (<?= strtoupper($edit_lang) ?>)</label>
-                    <textarea name="description" placeholder="Sisesta tõlge..."><?= htmlspecialchars($current_desc) ?></textarea>
-                     <?php if($edit_lang != 'et' && empty($current_desc)): ?>
-                        <small style="color:#718096; margin-top:5px;">Originaal (EST): <?= htmlspecialchars($s['description']) ?></small>
-                    <?php endif; ?>
+                    <textarea name="description" id="editor"><?= htmlspecialchars($current_desc) ?></textarea>
                 </div>
 
                 <div class="form-group">
                     <label class="input-title">Kalkulaatori tüüp (Ühine)</label>
                     <select name="calc_type">
                         <?php $current_type = isset($s['calc_type']) ? $s['calc_type'] : 'none'; ?>
-                        <option value="none" <?= $current_type == 'none' ? 'selected' : '' ?>>Ilma kalkulaatorita</option>
+                        <option value="no_calc.php" <?= ($current_type == 'no_calc.php' || $current_type == 'none' || empty($current_type)) ? 'selected' : '' ?>>Ilma kalkulaatorita (vorm)</option>
                         <option value="visiitkaardid" <?= $current_type == 'visiitkaardid' ? 'selected' : '' ?>>Visiitkaardid</option>
                         <option value="flaierid" <?= $current_type == 'flaierid' ? 'selected' : '' ?>>Flaierid</option>
                         <option value="voldikud" <?= $current_type == 'voldikud' ? 'selected' : '' ?>>Voldikud</option>
                         <option value="plakatid" <?= $current_type == 'plakatid' ? 'selected' : '' ?>>Plakatid</option>
+                        <option value="rollup" <?= $current_type == 'rollup' ? 'selected' : '' ?>>Roll-up stendid ja lippud</option>
+                        <option value="brosuurid" <?= $current_type == 'brosuurid' ? 'selected' : '' ?>>Brošüürid</option>
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label class="input-title">Toote pilt (Ühine kõikidele keeltele)</label>
+                    <label class="input-title">Toote pilt (Ühine)</label>
                     <?php if(!empty($s['image_url'])): ?>
                         <img src="../img/<?= $s['image_url'] ?>" class="preview-img" alt="Current Image">
                     <?php endif; ?>
@@ -158,6 +162,16 @@ $current_desc = isset($s[$col_desc]) ? $s[$col_desc] : '';
         </form>
     </div>
 </div>
+
+<script>
+    ClassicEditor
+        .create(document.querySelector('#editor'), {
+            toolbar: [ 'bold', 'italic', '|', 'bulletedList', 'numberedList', '|', 'undo', 'redo' ]
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
 
 </body>
 </html>

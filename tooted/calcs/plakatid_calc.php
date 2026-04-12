@@ -107,12 +107,11 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <div class="price-vat"><?= $t['vat'] ?></div>
     </div>
 
-    <form id="orderForm" action="../submit_order.php" method="POST" class="order-form" style="display: none;">
-        <input type="hidden" name="toode" value="Plakatid">
-        <input type="hidden" name="kogus" id="hidden_qty">
-        <input type="hidden" name="kokku_hind" id="hidden_total">
-        <input type="hidden" name="formaat" id="hidden_formaat">
-        <input type="hidden" name="paber" id="hidden_paber">
+<form id="orderForm" action="../submit_order.php" method="POST" class="order-form" style="display: none;">
+        <input type="hidden" name="service_id" value="<?= $id ?>">
+        <input type="hidden" name="quantity" id="hidden_qty">
+        <input type="hidden" name="total_price" id="hidden_total">
+        <input type="hidden" name="paper_type" id="hidden_paper_type">
 
         <input type="text" name="client_name" class="calc-input form-spacing" placeholder="<?= $t['ph_name'] ?>" required>
         <input type="email" name="client_email" class="calc-input form-spacing" placeholder="<?= $t['ph_email'] ?>" required>
@@ -215,15 +214,18 @@ function updatePrice() {
     const finalDisplay = total.toFixed(2);
     document.getElementById('final_price').innerText = finalDisplay;
 
-    // Заполнение скрытых полей для отправки
+    // --- ПЕРЕДАЧА ДАННЫХ ДЛЯ ОБРАБОТЧИКА ПИСЕМ ---
     document.getElementById('hidden_qty').value = qty;
     document.getElementById('hidden_total').value = finalDisplay + ' €';
-    document.getElementById('hidden_formaat').value = formaat;
     
-    // Получаем красивое название бумаги для email
+    // Получаем красивое название бумаги для email и склеиваем с форматом
     const paberSelect = document.getElementById('paber');
     const paberName = paberSelect.options[paberSelect.selectedIndex].text;
-    document.getElementById('hidden_paber').value = paberName;
+    
+    const hiddenPaperField = document.getElementById('hidden_paper_type');
+    if (hiddenPaperField) {
+        hiddenPaperField.value = "Formaat: " + formaat + " | Paber: " + paberName;
+    }
 }
 
 // Синхронизация ползунка и поля ввода

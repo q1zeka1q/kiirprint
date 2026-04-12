@@ -86,13 +86,31 @@ if ($slides_res->num_rows == 0) {
         </div>
     </div>
 
-    <section class="section-grey">
+<section class="section-grey">
         <div class="container">
             <div class="about-content">
-                <h1 class="main-title"><?php echo htmlspecialchars(get_setting('home_title')); ?></h1>
+                <?php
+                // Определяем суффикс языка (если 'et', то пусто, если другие - то '_ru', '_en', '_fi')
+                $lang_suffix = ($current_lang == 'et') ? '' : '_' . $current_lang;
+                
+                // Пробуем получить заголовок на текущем языке
+                $display_home_title = get_setting('home_title' . $lang_suffix);
+                // Если пусто (перевод не заполнен), берем базовый (эстонский)
+                if (empty($display_home_title)) {
+                    $display_home_title = get_setting('home_title');
+                }
+
+                // Пробуем получить текст на текущем языке
+                $display_home_subtitle = get_setting('home_subtitle' . $lang_suffix);
+                // Если пусто, берем базовый
+                if (empty($display_home_subtitle)) {
+                    $display_home_subtitle = get_setting('home_subtitle');
+                }
+                ?>
+                <h1 class="main-title"><?php echo htmlspecialchars($display_home_title); ?></h1>
                 <div class="accent-line"></div>
                 <p class="description">
-                    <?php echo nl2br(htmlspecialchars(get_setting('home_subtitle'))); ?>
+                    <?php echo nl2br(htmlspecialchars($display_home_subtitle)); ?>
                 </p>
             </div>
         </div>
@@ -106,8 +124,8 @@ if ($slides_res->num_rows == 0) {
                 <p style="color: #718096; font-size: 16px;"><?= htmlspecialchars($lang['products_subtitle']) ?></p>
             </div>
 
-            <div class="cards-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
-<?php 
+<div class="cards-grid">
+                <?php 
                 $avaleht_tooted = $conn->query("SELECT * FROM services WHERE is_visible = 1 ORDER BY id DESC LIMIT 6");
                 
                 if ($avaleht_tooted && $avaleht_tooted->num_rows > 0): 
@@ -115,20 +133,19 @@ if ($slides_res->num_rows == 0) {
                         
                         // УМНАЯ ЛОГИКА ДЛЯ ТОВАРОВ
                         $lang_suffix = ($current_lang == 'et') ? '' : '_' . $current_lang;
-                        // Если перевод есть - берем его, если пусто - берем эстонский
                         $display_title = !empty($service['title' . $lang_suffix]) ? $service['title' . $lang_suffix] : $service['title'];
                 ?>
-                    <a href="tooted/toode.php?id=<?php echo $service['id']; ?>" class="modern-card" style="background-color: #ffffff; text-decoration: none; display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease;">
+                    <a href="tooted/toode.php?id=<?php echo $service['id']; ?>&lang=<?= $current_lang ?>" class="modern-card">
                         <div class="image-wrapper">
                             <?php if(!empty($service['image_url'])): ?>
-                                <img src="img/<?php echo htmlspecialchars($service['image_url']); ?>" alt="<?php echo htmlspecialchars($display_title); ?>" style="width: 100%; height: 250px; object-fit: cover; display: block;">
+                                <img src="img/<?php echo htmlspecialchars($service['image_url']); ?>" alt="<?php echo htmlspecialchars($display_title); ?>">
                             <?php else: ?>
-                                <img src="img/placeholder.png" alt="No image" style="width: 100%; height: 250px; object-fit: cover; display: block;">
+                                <img src="img/placeholder.png" alt="No image">
                             <?php endif; ?>
                         </div>
-                        <div class="card-info" style="padding: 20px; text-align: center;">
-                            <h3 style="margin: 0 0 10px 0; color: #333; font-size: 18px;"><?php echo htmlspecialchars(mb_strtoupper($display_title)); ?></h3>
-                            <span class="more-link" style="color: #f36f21; font-weight: 600; font-size: 14px;"><?= htmlspecialchars($lang['view_product']) ?> <i class="fas fa-arrow-right"></i></span>
+                        <div class="card-info">
+                            <h3><?php echo htmlspecialchars(mb_strtoupper($display_title)); ?></h3>
+                            <span class="more-link"><?= htmlspecialchars($lang['view_product']) ?> <i class="fas fa-arrow-right"></i></span>
                         </div>
                     </a>
                 <?php 
@@ -226,10 +243,68 @@ body { background: #fcfcfc; }
 .description { color: #4a5568; font-size: 1.15rem; line-height: 1.8; font-weight: 400; }
 
 /* CARDS LAYOUT */
-.modern-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.08); border-color: #f36f21; }
-.image-wrapper { height: 240px; display: flex; align-items: center; justify-content: center; background: #fff; overflow: hidden; }
-.image-wrapper img { max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.5s ease; }
-.modern-card:hover .image-wrapper img { transform: scale(1.05); }
+.cards-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 30px; 
+}
+
+.modern-card {
+    background-color: #ffffff;
+    text-decoration: none;
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #edf2f7;
+}
+
+.modern-card:hover { 
+    transform: translateY(-8px); 
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12); 
+    border-color: #f36f21;
+}
+
+.image-wrapper { 
+    height: 240px; 
+    width: 100%;
+    overflow: hidden; 
+    background: #f8fafc;
+}
+
+.image-wrapper img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; /* МАГИЯ ЗДЕСЬ: Картинка заполняет блок без белых полей! */
+    display: block;
+    transition: transform 0.5s ease; 
+}
+
+.modern-card:hover .image-wrapper img { 
+    transform: scale(1.05); /* Легкое увеличение картинки при наведении */
+}
+
+.card-info {
+    padding: 25px 20px;
+    text-align: center;
+}
+
+.card-info h3 {
+    margin: 0 0 15px 0;
+    color: #2d3748;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.more-link {
+    color: #f36f21;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
 /* QUERY SECTION */
 .query-container { max-width: 700px; margin: 0 auto; background: #fff; padding: 50px; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); border: 1px solid #edf2f7; }
