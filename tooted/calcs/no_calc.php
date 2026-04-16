@@ -46,25 +46,19 @@ $calc_lang = [
 ];
 
 $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
-
-// === ОБРАБОТКА ФОРМЫ (Сохраняем прямо в таблицу paringud) ===
 $success_msg = '';
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['send_custom_query'])) {
-    global $conn; // Берем подключение к БД из toode.php
+    global $conn; 
     
     $email = mysqli_real_escape_string($conn, $_POST['client_email']);
     $name = mysqli_real_escape_string($conn, $_POST['client_name']);
     $phone = mysqli_real_escape_string($conn, $_POST['client_phone']);
     $msg = mysqli_real_escape_string($conn, $_POST['client_message']);
     $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
-    
-    // Формируем красивый заголовок для админки, чтобы было понятно, откуда запрос
     $pealkiri = "Päring tootele: " . $product_name . " (" . $name . ")";
     
-    // Формируем полный текст, добавляя туда имя и телефон
     $tekst = "Nimi: " . $name . "\nTelefon: " . $phone . "\n\nSõnum:\n" . $msg;
 
-    // Записываем в базу
     $sql = "INSERT INTO paringud (email, pealkiri, tekst, is_read) VALUES ('$email', '$pealkiri', '$tekst', 0)";
     if ($conn->query($sql)) {
         $success_msg = $t['success'];

@@ -28,10 +28,7 @@
                     
 <?php
                     $l = isset($current_lang) ? $current_lang : 'et';
-                    
-                    // ПОЛНЫЙ МАССИВ ИЗ 54 ТОВАРОВ
-                    // Вместо знака "#" в поле 'url' вставляй свою ссылку! 
-                    // Например: 'url' => '/kiirprint/toode.php?id=1'
+
                     
                     $mega_items = [
                         ['et' => 'Blanketid', 'ru' => 'Бланки', 'en' => 'Letterheads', 'fi' => 'Lomakkeet', 'url' => 'http://localhost/kiirprint/tooted/toode.php?id=43'],
@@ -90,7 +87,6 @@
                         ['et' => 'Ümbrikud', 'ru' => 'Конверты', 'en' => 'Envelopes', 'fi' => 'Kirjekuoret', 'url' => '#']
                     ];
                     
-                    // Разбиваем весь массив на 4 равные колонки с помощью математики
                     $columns = array_chunk($mega_items, ceil(count($mega_items) / 4));
                     ?>
 
@@ -103,8 +99,7 @@
                                 <div class="mega-column">
                                     <?php foreach ($column as $item): ?>
                                         <?php 
-                                        // Умная подстановка: если ссылка пустая ('#'), то никуда не переходим.
-                                        // Если есть ссылка (например, toode.php?id=5), то код правильно приклеит &lang=ru или ?lang=ru
+                                       
                                         $link = $item['url'];
                                         if ($link !== '#') {
                                             $separator = (strpos($link, '?') !== false) ? '&' : '?';
@@ -119,7 +114,7 @@
                             <?php endforeach; ?>
                         </div>
                     </li>
-                    <li><a href="/kiirprint/tooted.php"><?= isset($lang['menu_requirements']) ? htmlspecialchars($lang['menu_requirements']) : 'NÕUDED FAILIDELE' ?></a></li>
+                    <li><a href="/kiirprint/nouded.php"><?= isset($lang['menu_requirements']) ? htmlspecialchars($lang['menu_requirements']) : 'NÕUDED FAILIDELE' ?></a></li>
                     <li><a href="/kiirprint/kontaktid.php"><?= isset($lang['menu_contact']) ? htmlspecialchars($lang['menu_contact']) : 'KONTAKTID' ?></a></li>
                     <li><a href="/kiirprint/admin/admin.php" class="admin-link"><i class="fas fa-lock"></i> ADMIN</a></li>
 
