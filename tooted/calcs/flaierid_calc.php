@@ -6,6 +6,7 @@ $l = isset($current_lang) ? $current_lang : 'et';
 $calc_lang = [
     'et' => [
         'qty' => 'Vali kogus:',
+        'qty_hint' => 'Kirjuta kogus siia',
         'format' => 'Vali formaat:',
         'paper' => 'Vali paber:',
         'paper_matt' => 'Matt',
@@ -20,11 +21,11 @@ $calc_lang = [
         'ph_email' => 'Teie e-mail',
         'ph_phone' => 'Telefon',
         'ph_msg' => 'Lisainfo (kuhu tarnida, erisoovid jne)',
-        'btn_order' => 'TELLI KOHE',
         'btn_send' => 'SAADA TELLIMUS'
     ],
     'ru' => [
         'qty' => 'Выберите количество:',
+        'qty_hint' => 'Впишите количество',
         'format' => 'Выберите формат:',
         'paper' => 'Выберите бумагу:',
         'paper_matt' => 'Матовая (Matt)',
@@ -39,11 +40,11 @@ $calc_lang = [
         'ph_email' => 'Ваш e-mail',
         'ph_phone' => 'Телефон',
         'ph_msg' => 'Доп. инфо (куда доставить, пожелания)',
-        'btn_order' => 'ЗАКАЗАТЬ СЕЙЧАС',
         'btn_send' => 'ОТПРАВИТЬ ЗАКАЗ'
     ],
     'en' => [
         'qty' => 'Select quantity:',
+        'qty_hint' => 'Type quantity here',
         'format' => 'Select format:',
         'paper' => 'Select paper:',
         'paper_matt' => 'Matte',
@@ -58,11 +59,11 @@ $calc_lang = [
         'ph_email' => 'Your e-mail',
         'ph_phone' => 'Phone',
         'ph_msg' => 'Additional info (delivery address, requests)',
-        'btn_order' => 'ORDER NOW',
         'btn_send' => 'SEND ORDER'
     ],
     'fi' => [
         'qty' => 'Valitse määrä:',
+        'qty_hint' => 'Kirjoita määrä tähän',
         'format' => 'Valitse koko:',
         'paper' => 'Valitse paperi:',
         'paper_matt' => 'Matta',
@@ -77,7 +78,6 @@ $calc_lang = [
         'ph_email' => 'Sähköpostisi',
         'ph_phone' => 'Puhelin',
         'ph_msg' => 'Lisätiedot (toimitusosoite, toiveet)',
-        'btn_order' => 'TILAA NYT',
         'btn_send' => 'LÄHETÄ TILAUS'
     ]
 ];
@@ -90,8 +90,11 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
     <div class="calc-group">
         <label class="calc-label"><?= $t['qty'] ?></label>
         <div class="qty-row">
-            <input type="range" id="q_range" class="qty-range" min="100" max="2000" step="50" value="100">
-            <input type="number" id="q_input" class="qty-number" value="100" min="1">
+            <input type="range" id="q_range" class="qty-range" min="1" max="2000" step="1" value="1">
+            <div class="qty-input-wrapper">
+                <input type="number" id="q_input" class="qty-number" value="1" min="1">
+                <div class="qty-hint"><?= $t['qty_hint'] ?></div>
+            </div>
         </div>
     </div>
 
@@ -138,7 +141,7 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <div class="price-vat"><?= $t['vat'] ?></div>
     </div>
 
-<form id="orderForm" action="../submit_order.php" method="POST" class="order-form" style="display: none;">
+    <form id="orderForm" action="../submit_order.php" method="POST" class="order-form">
         <input type="hidden" name="service_id" value="<?= $id ?>">
         <input type="hidden" name="quantity" id="hidden_qty">
         <input type="hidden" name="total_price" id="hidden_total">
@@ -152,7 +155,6 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <button type="submit" class="btn-submit"><?= $t['btn_send'] ?></button>
     </form>
     
-    <button id="showOrder" class="btn-submit"><?= $t['btn_order'] ?></button>
 </div>
 
 <style>
@@ -177,7 +179,9 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 /* Ползунок и количество */
 .qty-row { display: flex; align-items: center; gap: 15px; }
 .qty-range { flex-grow: 1; accent-color: #f36f21; height: 6px; }
-.qty-number { width: 90px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center; box-sizing: border-box; font-weight: bold; color: #f36f21;}
+.qty-input-wrapper { display: flex; flex-direction: column; align-items: center; }
+.qty-number { width: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center; box-sizing: border-box; font-weight: bold; color: #f36f21;}
+.qty-hint { font-size: 11px; color: #888; margin-top: 5px; text-align: center; }
 
 /* Радиокнопки */
 .radio-group label { 
@@ -200,7 +204,7 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 .price-vat { font-size: 12px; color: #999; }
 
 /* Форма и кнопки */
-.order-form { margin-top: 20px; border-top: 2px dashed #eee; padding-top: 25px; }
+.order-form { margin-top: 25px; border-top: 2px dashed #eee; padding-top: 25px; }
 .form-spacing { margin-bottom: 12px; }
 .btn-submit { 
     width: 100%; 
@@ -222,7 +226,14 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 /* МОБИЛЬНАЯ ВЕРСИЯ */
 @media (max-width: 480px) {
     .qty-row { flex-direction: column; align-items: stretch; gap: 10px; }
-    .qty-number { width: 100%; text-align: left; }
+    .qty-input-wrapper { width: 100%; align-items: stretch; }
+    
+    /* Оставляем ячейку на 100% ширины, но текст (цифру) прижимаем влево */
+    .qty-number { width: 100%; text-align: left; padding-left: 15px; } 
+    
+    /* Подсказку тоже ровняем по левому краю */
+    .qty-hint { text-align: left; padding-left: 5px; width: 100%; } 
+    
     .price-value { font-size: 32px; }
     .calc-container { padding-bottom: 20px; }
 }
@@ -235,20 +246,48 @@ function updatePrice() {
 
     const formaat = document.getElementById('formaat').value;
     const trukk = document.querySelector('input[name="trukk"]:checked').value;
+    const gramm = document.getElementById('gramm').value; // Теперь мы берем плотность бумаги!
     
     let baseTkPrice = 0; 
 
-    // 1. Ищем базовую цену за 1 штуку (по формату A4)
-    if (trukk === "1") { // Односторонняя
-        if (qty < 200) baseTkPrice = 0.14;
-        else if (qty < 500) baseTkPrice = 0.13;
-        else if (qty < 1000) baseTkPrice = 0.12;
-        else baseTkPrice = 0.11;
-    } else { // Двусторонняя
-        if (qty < 200) baseTkPrice = 0.23;
-        else if (qty < 500) baseTkPrice = 0.22;
-        else if (qty < 1000) baseTkPrice = 0.20;
-        else baseTkPrice = 0.18;
+    // 1. Ищем базовую цену за 1 штуку (по формату A4) в зависимости от плотности бумаги
+    if (gramm === "200g") {
+        if (trukk === "1") { // Односторонняя
+            if (qty < 200) baseTkPrice = 0.15;
+            else if (qty < 500) baseTkPrice = 0.14;
+            else if (qty < 1000) baseTkPrice = 0.13;
+            else baseTkPrice = 0.12;
+        } else { // Двусторонняя
+            if (qty < 200) baseTkPrice = 0.24;
+            else if (qty < 500) baseTkPrice = 0.23;
+            else if (qty < 1000) baseTkPrice = 0.21;
+            else baseTkPrice = 0.19;
+        }
+    } else if (gramm === "250g") {
+        if (trukk === "1") { // Односторонняя
+            if (qty < 200) baseTkPrice = 0.16;
+            else if (qty < 500) baseTkPrice = 0.15;
+            else if (qty < 1000) baseTkPrice = 0.14;
+            else baseTkPrice = 0.13;
+        } else { // Двусторонняя
+            if (qty < 200) baseTkPrice = 0.25;
+            else if (qty < 500) baseTkPrice = 0.24;
+            else if (qty < 1000) baseTkPrice = 0.22;
+            else baseTkPrice = 0.20;
+        }
+    } else {
+        // Стандартные цены для 120g, 150g, 170g
+        if (trukk === "1") { // Односторонняя
+            if (qty < 200) baseTkPrice = 0.14;
+            else if (qty < 500) baseTkPrice = 0.13;
+            else if (qty < 1000) baseTkPrice = 0.12;
+            else baseTkPrice = 0.11;
+        } else { // Двусторонняя
+            if (qty < 200) baseTkPrice = 0.23;
+            else if (qty < 500) baseTkPrice = 0.22;
+            else if (qty < 1000) baseTkPrice = 0.20;
+            else baseTkPrice = 0.18;
+        }
     }
 
     // 2. Коэффициенты форматов
@@ -313,13 +352,6 @@ document.getElementById('paber').addEventListener('change', updatePrice);
 document.getElementById('gramm').addEventListener('change', updatePrice);
 document.querySelectorAll('input[name="trukk"]').forEach(radio => {
     radio.addEventListener('change', updatePrice);
-});
-
-// Показ формы
-document.getElementById('showOrder').addEventListener('click', function() {
-    this.style.display = 'none';
-    document.getElementById('orderForm').style.display = 'block';
-    updatePrice();
 });
 
 // Инициализация при загрузке

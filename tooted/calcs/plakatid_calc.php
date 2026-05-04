@@ -6,6 +6,7 @@ $l = isset($current_lang) ? $current_lang : 'et';
 $calc_lang = [
     'et' => [
         'qty' => 'Vali kogus:',
+        'qty_hint' => 'Kirjuta kogus siia',
         'format' => 'Vali formaat:',
         'paper' => 'Vali paber:',
         'paper_150' => '150g matt',
@@ -17,11 +18,11 @@ $calc_lang = [
         'ph_email' => 'Teie e-mail',
         'ph_phone' => 'Telefon',
         'ph_msg' => 'Lisainfo (kuhu tarnida, erisoovid jne)',
-        'btn_order' => 'TELLI KOHE',
         'btn_send' => 'SAADA TELLIMUS'
     ],
     'ru' => [
         'qty' => 'Выберите количество:',
+        'qty_hint' => 'Впишите количество',
         'format' => 'Выберите формат:',
         'paper' => 'Выберите бумагу:',
         'paper_150' => '150г матовая',
@@ -33,11 +34,11 @@ $calc_lang = [
         'ph_email' => 'Ваш e-mail',
         'ph_phone' => 'Телефон',
         'ph_msg' => 'Доп. инфо (куда доставить, пожелания)',
-        'btn_order' => 'ЗАКАЗАТЬ СЕЙЧАС',
         'btn_send' => 'ОТПРАВИТЬ ЗАКАЗ'
     ],
     'en' => [
         'qty' => 'Select quantity:',
+        'qty_hint' => 'Type quantity here',
         'format' => 'Select format:',
         'paper' => 'Select paper:',
         'paper_150' => '150g matte',
@@ -49,11 +50,11 @@ $calc_lang = [
         'ph_email' => 'Your e-mail',
         'ph_phone' => 'Phone',
         'ph_msg' => 'Additional info (delivery address, requests)',
-        'btn_order' => 'ORDER NOW',
         'btn_send' => 'SEND ORDER'
     ],
     'fi' => [
         'qty' => 'Valitse määrä:',
+        'qty_hint' => 'Kirjoita määrä tähän',
         'format' => 'Valitse koko:',
         'paper' => 'Valitse paperi:',
         'paper_150' => '150g matta',
@@ -65,7 +66,6 @@ $calc_lang = [
         'ph_email' => 'Sähköpostisi',
         'ph_phone' => 'Puhelin',
         'ph_msg' => 'Lisätiedot (toimitusosoite, toiveet)',
-        'btn_order' => 'TILAA NYT',
         'btn_send' => 'LÄHETÄ TILAUS'
     ]
 ];
@@ -79,7 +79,10 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <label class="calc-label"><?= $t['qty'] ?></label>
         <div class="qty-row">
             <input type="range" id="q_range" class="qty-range" min="1" max="200" step="1" value="1">
-            <input type="number" id="q_input" class="qty-number" value="1" min="1" max="200">
+            <div class="qty-input-wrapper">
+                <input type="number" id="q_input" class="qty-number" value="1" min="1" max="200">
+                <div class="qty-hint"><?= $t['qty_hint'] ?></div>
+            </div>
         </div>
     </div>
 
@@ -107,7 +110,7 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <div class="price-vat"><?= $t['vat'] ?></div>
     </div>
 
-<form id="orderForm" action="../submit_order.php" method="POST" class="order-form" style="display: none;">
+    <form id="orderForm" action="../submit_order.php" method="POST" class="order-form">
         <input type="hidden" name="service_id" value="<?= $id ?>">
         <input type="hidden" name="quantity" id="hidden_qty">
         <input type="hidden" name="total_price" id="hidden_total">
@@ -121,11 +124,10 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <button type="submit" class="btn-submit"><?= $t['btn_send'] ?></button>
     </form>
     
-    <button id="showOrder" class="btn-submit"><?= $t['btn_order'] ?></button>
 </div>
 
 <style>
-/* Стили для калькулятора (Те же, что и у флаеров) */
+/* Стили для калькулятора */
 .calc-container { font-family: sans-serif; }
 .calc-group { margin-top: 22px; }
 .calc-label { font-weight: 700; display: block; margin-bottom: 8px; color: #333; font-size: 15px; }
@@ -138,7 +140,9 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 
 .qty-row { display: flex; align-items: center; gap: 15px; }
 .qty-range { flex-grow: 1; accent-color: #f36f21; height: 6px; }
-.qty-number { width: 90px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center; box-sizing: border-box; font-weight: bold; color: #f36f21;}
+.qty-input-wrapper { display: flex; flex-direction: column; align-items: center; }
+.qty-number { width: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center; box-sizing: border-box; font-weight: bold; color: #f36f21;}
+.qty-hint { font-size: 11px; color: #888; margin-top: 5px; text-align: center; }
 
 .radio-group label { 
     display: block; padding: 12px 15px; background: #fdfdfd; border: 1px solid #eee; 
@@ -152,7 +156,7 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 .price-value { font-size: 38px; font-weight: 900; color: #f36f21; margin: 10px 0; }
 .price-vat { font-size: 12px; color: #999; }
 
-.order-form { margin-top: 20px; border-top: 2px dashed #eee; padding-top: 25px; }
+.order-form { margin-top: 25px; border-top: 2px dashed #eee; padding-top: 25px; }
 .form-spacing { margin-bottom: 12px; }
 .btn-submit { 
     width: 100%; background: #f36f21; color: white; border: none; padding: 18px; 
@@ -161,9 +165,12 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 }
 .btn-submit:hover { background: #d95d16; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(243, 111, 33, 0.25); }
 
+/* Мобильная версия с выравниванием по левому краю */
 @media (max-width: 480px) {
-    .qty-row { flex-direction: column; align-items: stretch; gap: 10px; }
-    .qty-number { width: 100%; text-align: left; }
+    .qty-row { flex-direction: column; align-items: stretch; gap: 15px; }
+    .qty-input-wrapper { width: 100%; align-items: stretch; }
+    .qty-number { width: 100%; text-align: left; padding-left: 15px; }
+    .qty-hint { text-align: left; padding-left: 5px; width: 100%; }
     .price-value { font-size: 32px; }
     .calc-container { padding-bottom: 20px; }
 }
@@ -243,13 +250,6 @@ document.querySelectorAll('input[name="formaat"]').forEach(radio => {
     radio.addEventListener('change', updatePrice);
 });
 document.getElementById('paber').addEventListener('change', updatePrice);
-
-// Показ формы
-document.getElementById('showOrder').addEventListener('click', function() {
-    this.style.display = 'none';
-    document.getElementById('orderForm').style.display = 'block';
-    updatePrice();
-});
 
 // Инициализация при загрузке
 updatePrice();

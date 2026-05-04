@@ -3,9 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kiirprint.ee - Sinu usaldusväärne trükipartner</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/kiirprint/css/style.css"> 
+    <link rel="stylesheet" href="/kiirprint/css/style.css">
+    <?php
+    // --- УМНОЕ SEO ДЛЯ ГЛАВНОЙ СТРАНИЦЫ И САЙТА ---
+    $seo_lang = isset($current_lang) ? $current_lang : 'et';
+
+    // Базовый URL вашего сайта (поменяй, если домен другой)
+    $site_url = 'https://kiirprint.ee/kiirprint';
+    $current_url = $site_url . $_SERVER['REQUEST_URI'];
+
+    $seo_data = [
+        'et' => [
+            'title' => 'Kiirprint - Sinu usaldusväärne trükikoda | Trükiteenused',
+            'desc' => 'Kvaliteetsed trükiteenused kiirelt ja soodsalt. Visiitkaardid, flaierid, brošüürid, plakatid ja palju muud. Telli trükised mugavalt veebist!'
+        ],
+        'ru' => [
+            'title' => 'Kiirprint - Быстрая типография и полиграфия | Печать на заказ',
+            'desc' => 'Профессиональные типографские услуги по выгодным ценам. Печать визиток, флаеров, брошюр и плакатов. Быстрое выполнение заказов!'
+        ],
+        'en' => [
+            'title' => 'Kiirprint - Fast & Reliable Printing House | Print Services',
+            'desc' => 'High-quality printing services at competitive prices. Business cards, flyers, brochures, posters, and more. Order prints online easily!'
+        ],
+        'fi' => [
+            'title' => 'Kiirprint - Luotettava painotalo | Painopalvelut',
+            'desc' => 'Laadukkaat painopalvelut nopeasti ja edullisesti. Käyntikortit, esitteet, flyerit ja julisteet. Tilaa painotuotteet helposti netistä!'
+        ]
+    ];
+
+    // Получаем данные для текущего языка
+    $seo_title = isset($seo_data[$seo_lang]['title']) ? $seo_data[$seo_lang]['title'] : $seo_data['et']['title'];
+    $seo_desc = isset($seo_data[$seo_lang]['desc']) ? $seo_data[$seo_lang]['desc'] : $seo_data['et']['desc'];
+    ?>
+
+    <title><?= htmlspecialchars($seo_title) ?></title>
+    <meta name="description" content="<?= htmlspecialchars($seo_desc) ?>">
+    <meta name="keywords" content="trükikoda, типография, printing house, painotalo, visiitkaardid, flaierid, trükiteenused">
+
+    <meta property="og:title" content="<?= htmlspecialchars($seo_title) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($seo_desc) ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($current_url) ?>">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Kiirprint">
+
+    <link rel="alternate" hreflang="et" href="<?= $site_url ?>/?lang=et" />
+    <link rel="alternate" hreflang="ru" href="<?= $site_url ?>/?lang=ru" />
+    <link rel="alternate" hreflang="en" href="<?= $site_url ?>/?lang=en" />
+    <link rel="alternate" hreflang="fi" href="<?= $site_url ?>/?lang=fi" />
+    <link rel="alternate" hreflang="x-default" href="<?= $site_url ?>/" /> 
 </head>
 <body>
 
@@ -31,69 +77,70 @@
 
                     
                     $mega_items = [
-                        ['et' => 'Blanketid', 'ru' => 'Бланки', 'en' => 'Letterheads', 'fi' => 'Lomakkeet', 'url' => 'http://localhost/kiirprint/tooted/toode.php?id=43'],
-                        ['et' => 'Brošüürid', 'ru' => 'Брошюры', 'en' => 'Brochures', 'fi' => 'Esitteet', 'url' => '#'],
-                        ['et' => 'Bännerid', 'ru' => 'Баннеры', 'en' => 'Banners', 'fi' => 'Banderollit', 'url' => '#'],
-                        ['et' => 'CD ümbrised', 'ru' => 'Обложки для CD', 'en' => 'CD covers', 'fi' => 'CD-kannet', 'url' => '#'],
-                        ['et' => 'Diplomid', 'ru' => 'Дипломы', 'en' => 'Diplomas', 'fi' => 'Diplomat', 'url' => '#'],
-                        ['et' => 'Doorhangerid', 'ru' => 'Хенгеры на дверь', 'en' => 'Door hangers', 'fi' => 'Ovikyltit', 'url' => '#'],
-                        ['et' => 'Erikujulised trükised', 'ru' => 'Нестандартная полиграфия', 'en' => 'Custom shaped prints', 'fi' => 'Erikoismuotoiset painotuotteet', 'url' => '#'],
-                        ['et' => 'Eripaberid', 'ru' => 'Специальная бумага', 'en' => 'Special papers', 'fi' => 'Erikoispaperit', 'url' => '#'],
-                        ['et' => 'Etiketid', 'ru' => 'Этикетки', 'en' => 'Labels', 'fi' => 'Etiketit', 'url' => '#'],
-                        ['et' => 'Flaierid', 'ru' => 'Флаеры', 'en' => 'Flyers', 'fi' => 'Lentolehtiset', 'url' => '#'],
-                        ['et' => 'Hinnakirjad', 'ru' => 'Прайс-листы', 'en' => 'Price lists', 'fi' => 'Hinnastot', 'url' => '#'],
-                        ['et' => 'Hinnasildid', 'ru' => 'Ценники', 'en' => 'Price tags', 'fi' => 'Hintalaput', 'url' => '#'],
-                        ['et' => 'Kaelakaardid', 'ru' => 'Бейджи', 'en' => 'ID badges', 'fi' => 'Nimikortit', 'url' => '#'],
-                        ['et' => 'Kalendrid', 'ru' => 'Календари', 'en' => 'Calendars', 'fi' => 'Kalenterit', 'url' => '#'],
-                        ['et' => 'Kammköide', 'ru' => 'Пластиковая пружина', 'en' => 'Comb binding', 'fi' => 'Kierresidonta', 'url' => '#'],
-                        ['et' => 'KAPA', 'ru' => 'Пенокартон (KAPA)', 'en' => 'Foam board (KAPA)', 'fi' => 'KAPA-levyt', 'url' => '#'],
-                        ['et' => 'Kasutusjuhendid', 'ru' => 'Инструкции', 'en' => 'User manuals', 'fi' => 'Käyttöohjeet', 'url' => '#'],
-                        ['et' => 'Kataloogid', 'ru' => 'Каталоги', 'en' => 'Catalogs', 'fi' => 'Luettelot', 'url' => '#'],
-                        ['et' => 'Kinkekaardid', 'ru' => 'Подарочные карты', 'en' => 'Gift cards', 'fi' => 'Lahjakortit', 'url' => '#'],
-                        ['et' => 'Klamberköide', 'ru' => 'Скрепка (переплет)', 'en' => 'Staple binding', 'fi' => 'Vihkosidonta', 'url' => '#'],
-                        ['et' => 'Kleebised', 'ru' => 'Наклейки', 'en' => 'Stickers', 'fi' => 'Tarrat', 'url' => '#'],
-                        ['et' => 'Kliendikaardid', 'ru' => 'Карты клиента', 'en' => 'Customer cards', 'fi' => 'Asiakaskortit', 'url' => '#'],
-                        ['et' => 'Kutsed', 'ru' => 'Приглашения', 'en' => 'Invitations', 'fi' => 'Kutsut', 'url' => '#'],
-                        ['et' => 'Laiformaat tooted', 'ru' => 'Широкоформатная печать', 'en' => 'Large format products', 'fi' => 'Suurkuvatulosteet', 'url' => '#'],
-                        ['et' => 'Lauakalendrid', 'ru' => 'Настольные календари', 'en' => 'Desk calendars', 'fi' => 'Pöytäkalenterit', 'url' => '#'],
-                        ['et' => 'Lauarääkijad', 'ru' => 'Тейбл-тенты', 'en' => 'Table tents', 'fi' => 'Pöytäkolmiot', 'url' => '#'],
-                        ['et' => 'Lipud', 'ru' => 'Флаги', 'en' => 'Flags', 'fi' => 'Liput', 'url' => '#'],
-                        ['et' => 'Menüüd', 'ru' => 'Меню', 'en' => 'Menus', 'fi' => 'Ruokalistat', 'url' => '#'],
-                        ['et' => 'Messiseinad', 'ru' => 'Выставочные стенды', 'en' => 'Exhibition walls', 'fi' => 'Messuseinät', 'url' => '#'],
-                        ['et' => 'Märkmikud', 'ru' => 'Блокноты', 'en' => 'Notebooks', 'fi' => 'Muistikirjat', 'url' => '#'],
-                        ['et' => 'Numereerimine', 'ru' => 'Нумерация', 'en' => 'Numbering', 'fi' => 'Numerointi', 'url' => '#'],
-                        ['et' => 'Pakendid', 'ru' => 'Упаковка', 'en' => 'Packaging', 'fi' => 'Pakkaukset', 'url' => '#'],
-                        ['et' => 'Personaliseerimine', 'ru' => 'Персонализация', 'en' => 'Personalization', 'fi' => 'Personointi', 'url' => '#'],
-                        ['et' => 'Piletid', 'ru' => 'Билеты', 'en' => 'Tickets', 'fi' => 'Pääsyliput', 'url' => '#'],
-                        ['et' => 'Plaadid', 'ru' => 'Таблички на пластике', 'en' => 'Printed boards', 'fi' => 'Kyltit ja levyt', 'url' => '#'],
-                        ['et' => 'Plakatid alates A2', 'ru' => 'Плакаты от A2', 'en' => 'Posters from A2', 'fi' => 'Julisteet alk. A2', 'url' => '#'],
-                        ['et' => 'Plakatid kuni A3', 'ru' => 'Плакаты до A3', 'en' => 'Posters up to A3', 'fi' => 'Julisteet A3 asti', 'url' => '#'],
-                        ['et' => 'Postkaardid', 'ru' => 'Открытки', 'en' => 'Postcards', 'fi' => 'Postikortit', 'url' => '#'],
-                        ['et' => 'Põrandakleebised', 'ru' => 'Напольные наклейки', 'en' => 'Floor stickers', 'fi' => 'Lattiatarrat', 'url' => '#'],
-                        ['et' => 'Raamatud', 'ru' => 'Книги', 'en' => 'Books', 'fi' => 'Kirjat', 'url' => '#'],
-                        ['et' => 'Riiulirääkijad', 'ru' => 'Шелфтокеры', 'en' => 'Shelf talkers', 'fi' => 'Hyllypuhujat', 'url' => '#'],
-                        ['et' => 'Roll-upid', 'ru' => 'Roll-up стенды', 'en' => 'Roll-ups', 'fi' => 'Roll-upit', 'url' => '#'],
-                        ['et' => 'Sildid', 'ru' => 'Вывески и таблички', 'en' => 'Signs', 'fi' => 'Opasteet', 'url' => '#'],
-                        ['et' => 'Sleevid', 'ru' => 'Шуберы (Сливы)', 'en' => 'Sleeves', 'fi' => 'Vyötteet', 'url' => '#'],
-                        ['et' => 'Šokolaadi karbid', 'ru' => 'Коробки для шоколада', 'en' => 'Chocolate boxes', 'fi' => 'Suklaarasiat', 'url' => '#'],
-                        ['et' => 'Tension seinad', 'ru' => 'Натяжные стенды', 'en' => 'Tension walls', 'fi' => 'Kangasseinät', 'url' => '#'],
-                        ['et' => 'Tootekataloogid', 'ru' => 'Каталоги товаров', 'en' => 'Product catalogs', 'fi' => 'Tuoteluettelot', 'url' => '#'],
-                        ['et' => 'Tooteümbrised', 'ru' => 'Упаковка для товаров', 'en' => 'Product wraps', 'fi' => 'Tuotekääreet', 'url' => '#'],
-                        ['et' => 'Tänukirjad', 'ru' => 'Благодарственные письма', 'en' => 'Thank you letters', 'fi' => 'Kiitoskirjeet', 'url' => '#'],
-                        ['et' => 'Ukse- ja aknakleebised', 'ru' => 'Наклейки на окна и двери', 'en' => 'Door & window stickers', 'fi' => 'Ovi- ja ikkunatarrat', 'url' => '#'],
-                        ['et' => 'Visiitkaardid', 'ru' => 'Визитки', 'en' => 'Business cards', 'fi' => 'Käyntikortit', 'url' => '#'],
-                        ['et' => 'Wobblerid', 'ru' => 'Воблеры', 'en' => 'Wobblers', 'fi' => 'Hyllyheilujat', 'url' => '#'],
-                        ['et' => 'Voldikud', 'ru' => 'Буклеты', 'en' => 'Folders / Brochures', 'fi' => 'Taitteet', 'url' => '#'],
-                        ['et' => 'Ümbrikud', 'ru' => 'Конверты', 'en' => 'Envelopes', 'fi' => 'Kirjekuoret', 'url' => '#']
+                        ['et' => 'Blanketid', 'ru' => 'Бланки', 'en' => 'Letterheads', 'fi' => 'Lomakkeet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=43'],
+                        ['et' => 'Brošüürid', 'ru' => 'Брошюры', 'en' => 'Brochures', 'fi' => 'Esitteet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'Bännerid', 'ru' => 'Баннеры', 'en' => 'Banners', 'fi' => 'Banderollit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=35'],
+                        ['et' => 'CD ümbrised', 'ru' => 'Обложки для CD', 'en' => 'CD covers', 'fi' => 'CD-kannet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=33'],
+                        ['et' => 'Diplomid', 'ru' => 'Дипломы', 'en' => 'Diplomas', 'fi' => 'Diplomat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=43'],
+                        ['et' => 'Doorhangerid', 'ru' => 'Хенгеры на дверь', 'en' => 'Door hangers', 'fi' => 'Ovikyltit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=33'],
+                        ['et' => 'Erikujulised trükised', 'ru' => 'Нестандартная полиграфия', 'en' => 'Custom shaped prints', 'fi' => 'Erikoismuotoiset painotuotteet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=33'],
+                        ['et' => 'Eripaberid', 'ru' => 'Специальная бумага', 'en' => 'Special papers', 'fi' => 'Erikoispaperit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=29'],
+                        ['et' => 'Etiketid', 'ru' => 'Этикетки', 'en' => 'Labels', 'fi' => 'Etiketit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=41'],
+                        ['et' => 'Flaierid', 'ru' => 'Флаеры', 'en' => 'Flyers', 'fi' => 'Lentolehtiset', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=43'],
+                        ['et' => 'Hinnakirjad', 'ru' => 'Прайс-листы', 'en' => 'Price lists', 'fi' => 'Hinnastot', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=43'],
+                        ['et' => 'Hinnasildid', 'ru' => 'Ценники', 'en' => 'Price tags', 'fi' => 'Hintalaput', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=29'],
+                        ['et' => 'Kaelakaardid', 'ru' => 'Бейджи', 'en' => 'ID badges', 'fi' => 'Nimikortit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=29'],
+                        ['et' => 'Kalendrid', 'ru' => 'Календари', 'en' => 'Calendars', 'fi' => 'Kalenterit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=30'],
+                        ['et' => 'Kammköide', 'ru' => 'Пластиковая пружина', 'en' => 'Comb binding', 'fi' => 'Kierresidonta', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'KAPA', 'ru' => 'Пенокартон (KAPA)', 'en' => 'Foam board (KAPA)', 'fi' => 'KAPA-levyt', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=32'],
+                        ['et' => 'Kasutusjuhendid', 'ru' => 'Инструкции', 'en' => 'User manuals', 'fi' => 'Käyttöohjeet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'Kataloogid', 'ru' => 'Каталоги', 'en' => 'Catalogs', 'fi' => 'Luettelot', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'Kinkekaardid', 'ru' => 'Подарочные карты', 'en' => 'Gift cards', 'fi' => 'Lahjakortit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=34'],
+                        ['et' => 'Klamberköide', 'ru' => 'Скрепка (переплет)', 'en' => 'Staple binding', 'fi' => 'Vihkosidonta', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'Kleebised', 'ru' => 'Наклейки', 'en' => 'Stickers', 'fi' => 'Tarrat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=41'],
+                        ['et' => 'Kliendikaardid', 'ru' => 'Карты клиента', 'en' => 'Customer cards', 'fi' => 'Asiakaskortit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=34'],
+                        ['et' => 'Kutsed', 'ru' => 'Приглашения', 'en' => 'Invitations', 'fi' => 'Kutsut', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=34'],
+                        ['et' => 'Laiformaat tooted', 'ru' => 'Широкоформатная печать', 'en' => 'Large format products', 'fi' => 'Suurkuvatulosteet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=35'],
+                        ['et' => 'Lauakalendrid', 'ru' => 'Настольные календари', 'en' => 'Desk calendars', 'fi' => 'Pöytäkalenterit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=30'],
+                        ['et' => 'Lauarääkijad', 'ru' => 'Тейбл-тенты', 'en' => 'Table tents', 'fi' => 'Pöytäkolmiot', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=37'],
+                        ['et' => 'Lipud', 'ru' => 'Флаги', 'en' => 'Flags', 'fi' => 'Liput', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=36'],
+                        ['et' => 'Menüüd', 'ru' => 'Меню', 'en' => 'Menus', 'fi' => 'Ruokalistat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=31'],
+                        ['et' => 'Messiseinad', 'ru' => 'Выставочные стенды', 'en' => 'Exhibition walls', 'fi' => 'Messuseinät', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=36'],
+                        ['et' => 'Märkmikud', 'ru' => 'Блокноты', 'en' => 'Notebooks', 'fi' => 'Muistikirjat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'Numereerimine', 'ru' => 'Нумерация', 'en' => 'Numbering', 'fi' => 'Numerointi', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=29'],
+                        ['et' => 'Pakendid', 'ru' => 'Упаковка', 'en' => 'Packaging', 'fi' => 'Pakkaukset', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=33'],
+                        ['et' => 'Personaliseerimine', 'ru' => 'Персонализация', 'en' => 'Personalization', 'fi' => 'Personointi', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=29'],
+                        ['et' => 'Piletid', 'ru' => 'Билеты', 'en' => 'Tickets', 'fi' => 'Pääsyliput', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=29'],
+                        ['et' => 'Plaadid', 'ru' => 'Таблички на пластике', 'en' => 'Printed boards', 'fi' => 'Kyltit ja levyt', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=32'],
+                        ['et' => 'Plakatid alates A2', 'ru' => 'Плакаты от A2', 'en' => 'Posters from A2', 'fi' => 'Julisteet alk. A2', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=42'],
+                        ['et' => 'Plakatid kuni A3', 'ru' => 'Плакаты до A3', 'en' => 'Posters up to A3', 'fi' => 'Julisteet A3 asti', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=43'],
+                        ['et' => 'Postkaardid', 'ru' => 'Открытки', 'en' => 'Postcards', 'fi' => 'Postikortit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=34'],
+                        ['et' => 'Põrandakleebised', 'ru' => 'Напольные наклейки', 'en' => 'Floor stickers', 'fi' => 'Lattiatarrat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=35'],
+                        ['et' => 'Raamatud', 'ru' => 'Книги', 'en' => 'Books', 'fi' => 'Kirjat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'Riiulirääkijad', 'ru' => 'Шелфтокеры', 'en' => 'Shelf talkers', 'fi' => 'Hyllypuhujat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=37'],
+                        ['et' => 'Roll-upid', 'ru' => 'Roll-up стенды', 'en' => 'Roll-ups', 'fi' => 'Roll-upit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=36'],
+                        ['et' => 'Sildid', 'ru' => 'Вывески и таблички', 'en' => 'Signs', 'fi' => 'Opasteet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=41'],
+                        ['et' => 'Sleevid', 'ru' => 'Шуберы (Сливы)', 'en' => 'Sleeves', 'fi' => 'Vyötteet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=33'],
+                        ['et' => 'Šokolaadi karbid', 'ru' => 'Коробки для шоколада', 'en' => 'Chocolate boxes', 'fi' => 'Suklaarasiat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=33'],
+                        ['et' => 'Tension seinad', 'ru' => 'Натяжные стенды', 'en' => 'Tension walls', 'fi' => 'Kangasseinät', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=36'],
+                        ['et' => 'Tootekataloogid', 'ru' => 'Каталоги товаров', 'en' => 'Product catalogs', 'fi' => 'Tuoteluettelot', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=38'],
+                        ['et' => 'Tooteümbrised', 'ru' => 'Упаковка для товаров', 'en' => 'Product wraps', 'fi' => 'Tuotekääreet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=33'],
+                        ['et' => 'Tänukirjad', 'ru' => 'Благодарственные письма', 'en' => 'Thank you letters', 'fi' => 'Kiitoskirjeet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=43'],
+                        ['et' => 'Ukse- ja aknakleebised', 'ru' => 'Наклейки на окна и двери', 'en' => 'Door & window stickers', 'fi' => 'Ovi- ja ikkunatarrat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=35'],
+                        ['et' => 'Visiitkaardid', 'ru' => 'Визитки', 'en' => 'Business cards', 'fi' => 'Käyntikortit', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=40'],
+                        ['et' => 'Wobblerid', 'ru' => 'Воблеры', 'en' => 'Wobblers', 'fi' => 'Hyllyheilujat', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=37'],
+                        ['et' => 'Voldikud', 'ru' => 'Буклеты', 'en' => 'Folders / Brochures', 'fi' => 'Taitteet', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=39'],
+                        ['et' => 'Ümbrikud', 'ru' => 'Конверты', 'en' => 'Envelopes', 'fi' => 'Kirjekuoret', 'url' => 'https://kiirprint.ee/kiirprint/tooted/toode.php?id=29']
                     ];
                     
                     $columns = array_chunk($mega_items, ceil(count($mega_items) / 4));
                     ?>
 
                     <li class="products-dropdown">
-                        <a href="/kiirprint/tooted.php?lang=<?= $l ?>" class="products-link">
-                            <?= isset($lang['menu_products']) ? htmlspecialchars($lang['menu_products']) : 'TOOTED' ?> <i class="fas fa-chevron-down arrow-prod"></i>
-                        </a>
+                            <a href="/kiirprint/tooted.php?lang=<?= $l ?>" class="products-link">
+                                <span class="prod-text-link"><?= isset($lang['menu_products']) ? htmlspecialchars($lang['menu_products']) : 'TOOTED' ?></span> 
+                                <i class="fas fa-chevron-down arrow-prod"></i>
+                            </a>
                         <div class="mega-menu">
                             <?php foreach ($columns as $column): ?>
                                 <div class="mega-column">
@@ -342,6 +389,16 @@ body {
 .menu-toggle { display: none; background: transparent; border: none; color: #333333; font-size: 26px; cursor: pointer; transition: color 0.3s; }
 .menu-toggle:hover { color: #f36f21; }
 
+/* === АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ (iPad и средние экраны от 769px до 1150px) === */
+@media (max-width: 1150px) and (min-width: 769px) {
+    .site-header { padding: 15px 20px; }
+    .main-nav ul { gap: 12px; } /* Уменьшаем огромные отступы с 35px до 12px */
+    .main-nav ul li > a { font-size: 12px; letter-spacing: 0.5px; } /* Чуть уменьшаем шрифт */
+    .lang-dropdown { margin-left: 0; }
+    .lang-current { padding: 6px 10px !important; }
+    .social-icon { margin-left: 5px; margin-right: 0; }
+}
+
 /* МОБИЛЬНАЯ АДАПТАЦИЯ */
 @media (max-width: 768px) {
     .menu-toggle { display: block; }
@@ -443,6 +500,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const prodDropdown = document.querySelector('.products-dropdown');
         if(prodLink && prodDropdown) {
             prodLink.addEventListener('click', function(e) {
+                // Если кликнули прямо по самому слову (тексту)
+                if (e.target.closest('.prod-text-link')) {
+                    return; // Ссылка срабатывает как обычно, переходим на страницу!
+                }
+                // Если кликнули по пустой области или стрелочке - открываем меню
                 e.preventDefault();
                 prodDropdown.classList.toggle('open');
             });

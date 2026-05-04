@@ -5,7 +5,7 @@ $l = isset($current_lang) ? $current_lang : 'et';
 $calc_lang = [
     'et' => [
         'format' => 'Vali formaat:',
-        'format_a65' => 'A65 (1/3 A4)',
+        'format_a65' => 'A65',
         'format_a5' => 'A5',
         'format_a4' => 'A4',
         'fold' => 'Vali voltimise tüüp:',
@@ -20,21 +20,21 @@ $calc_lang = [
         'weight_120' => '120g',
         'weight_150' => '150g',
         'weight_170' => '170g',
-        'weight_200' => '200g (+ lisatasu)',
-        'weight_250' => '250g (+ lisatasu)',
+        'weight_200' => '200g',
+        'weight_250' => '250g',
         'qty' => 'Vali kogus:',
+        'qty_hint' => 'Kirjuta kogus siia',
         'total' => 'Hind kokku (KM-ta):',
         'vat' => 'Käibemaks ei sisaldu lõpphinnas',
         'ph_name' => 'Teie nimi',
         'ph_email' => 'Teie e-mail',
         'ph_phone' => 'Telefon',
         'ph_msg' => 'Lisainfo (kuhu tarnida, erisoovid jne)',
-        'btn_order' => 'TELLI KOHE',
         'btn_send' => 'SAADA TELLIMUS'
     ],
     'ru' => [
         'format' => 'Выберите формат:',
-        'format_a65' => 'A65 (1/3 A4)',
+        'format_a65' => 'A65',
         'format_a5' => 'A5',
         'format_a4' => 'A4',
         'fold' => 'Выберите тип фальцовки:',
@@ -49,21 +49,21 @@ $calc_lang = [
         'weight_120' => '120г',
         'weight_150' => '150г',
         'weight_170' => '170г',
-        'weight_200' => '200г (+ доплата)',
-        'weight_250' => '250г (+ доплата)',
+        'weight_200' => '200г',
+        'weight_250' => '250г',
         'qty' => 'Выберите количество:',
+        'qty_hint' => 'Впишите количество',
         'total' => 'Итого (без НДС):',
         'vat' => 'НДС не включен в стоимость',
         'ph_name' => 'Ваше имя',
         'ph_email' => 'Ваш e-mail',
         'ph_phone' => 'Телефон',
         'ph_msg' => 'Доп. инфо (куда доставить, пожелания)',
-        'btn_order' => 'ЗАКАЗАТЬ СЕЙЧАС',
         'btn_send' => 'ОТПРАВИТЬ ЗАКАЗ'
     ],
     'en' => [
         'format' => 'Select format:',
-        'format_a65' => 'A65 (1/3 A4)',
+        'format_a65' => 'A65',
         'format_a5' => 'A5',
         'format_a4' => 'A4',
         'fold' => 'Select folding type:',
@@ -78,21 +78,21 @@ $calc_lang = [
         'weight_120' => '120g',
         'weight_150' => '150g',
         'weight_170' => '170g',
-        'weight_200' => '200g (+ extra fee)',
-        'weight_250' => '250g (+ extra fee)',
+        'weight_200' => '200g',
+        'weight_250' => '250g',
         'qty' => 'Select quantity:',
+        'qty_hint' => 'Type quantity here',
         'total' => 'Total price (excl. VAT):',
         'vat' => 'VAT is not included in the final price',
         'ph_name' => 'Your name',
         'ph_email' => 'Your e-mail',
         'ph_phone' => 'Phone',
         'ph_msg' => 'Additional info (delivery address, requests)',
-        'btn_order' => 'ORDER NOW',
         'btn_send' => 'SEND ORDER'
     ],
     'fi' => [
         'format' => 'Valitse koko:',
-        'format_a65' => 'A65 (1/3 A4)',
+        'format_a65' => 'A65',
         'format_a5' => 'A5',
         'format_a4' => 'A4',
         'fold' => 'Valitse taitos:',
@@ -107,16 +107,16 @@ $calc_lang = [
         'weight_120' => '120g',
         'weight_150' => '150g',
         'weight_170' => '170g',
-        'weight_200' => '200g (+ lisämaksu)',
-        'weight_250' => '250g (+ lisämaksu)',
+        'weight_200' => '200g',
+        'weight_250' => '250g',
         'qty' => 'Valitse määrä:',
+        'qty_hint' => 'Kirjoita määrä tähän',
         'total' => 'Yhteensä (alv 0%):',
         'vat' => 'ALV ei sisälly lopulliseen hintaan',
         'ph_name' => 'Sinun nimesi',
         'ph_email' => 'Sähköpostisi',
         'ph_phone' => 'Puhelin',
         'ph_msg' => 'Lisätiedot (toimitusosoite, toiveet)',
-        'btn_order' => 'TILAA NYT',
         'btn_send' => 'LÄHETÄ TILAUS'
     ]
 ];
@@ -148,7 +148,6 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
             <img src="../img/voldikud_types.jpg" alt="Voltimise tüübid" class="fold-guide-img">
         </div>
     </div>
-</div>
 
     <div class="calc-group">
         <label class="calc-label"><?= $t['paper'] ?></label>
@@ -172,8 +171,11 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
     <div class="calc-group">
         <label class="calc-label"><?= $t['qty'] ?></label>
         <div class="qty-row">
-            <input type="range" id="q_range" class="qty-range" min="10" max="2000" step="10" value="100">
-            <input type="number" id="q_input" class="qty-number" value="100" min="1">
+            <input type="range" id="q_range" class="qty-range" min="10" max="2000" step="10" value="10">
+            <div class="qty-input-wrapper">
+                <input type="number" id="q_input" class="qty-number" value="10" min="10">
+                <div class="qty-hint"><?= $t['qty_hint'] ?></div>
+            </div>
         </div>
     </div>
 
@@ -183,7 +185,7 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <div class="price-vat"><?= $t['vat'] ?></div>
     </div>
 
-    <form id="orderForm" action="../submit_order.php" method="POST" class="order-form" style="display: none;">
+    <form id="orderForm" action="../submit_order.php" method="POST" class="order-form">
         <input type="hidden" name="service_id" value="<?= $id ?>">
         <input type="hidden" name="quantity" id="hidden_qty">
         <input type="hidden" name="total_price" id="hidden_total">
@@ -197,11 +199,10 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
         <button type="submit" class="btn-submit"><?= $t['btn_send'] ?></button>
     </form>
     
-    <button id="showOrder" class="btn-submit"><?= $t['btn_order'] ?></button>
 </div>
 
 <style>
-/* Стили калькулятора (Идентичны визиткам) */
+/* Стили калькулятора */
 .calc-container { font-family: sans-serif; }
 .calc-group { margin-top: 22px; }
 .calc-label { font-weight: 700; display: block; margin-bottom: 8px; color: #333; font-size: 15px; }
@@ -211,7 +212,9 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 
 .qty-row { display: flex; align-items: center; gap: 15px; }
 .qty-range { flex-grow: 1; accent-color: #f36f21; height: 6px; }
-.qty-number { width: 90px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center; box-sizing: border-box; font-weight: bold; color: #f36f21;}
+.qty-input-wrapper { display: flex; flex-direction: column; align-items: center; }
+.qty-number { width: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; text-align: center; box-sizing: border-box; font-weight: bold; color: #f36f21;}
+.qty-hint { font-size: 11px; color: #888; margin-top: 5px; text-align: center; }
 
 .radio-group label { display: block; padding: 12px 15px; background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: 0.2s; }
 .radio-group label:hover { background: #fff8f4; border-color: #f36f21; }
@@ -222,7 +225,7 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 .price-value { font-size: 38px; font-weight: 900; color: #f36f21; margin: 10px 0; }
 .price-vat { font-size: 12px; color: #999; }
 
-.order-form { margin-top: 20px; border-top: 2px dashed #eee; padding-top: 25px; }
+.order-form { margin-top: 25px; border-top: 2px dashed #eee; padding-top: 25px; }
 .form-spacing { margin-bottom: 12px; }
 .btn-submit { width: 100%; background: #f36f21; color: white; border: none; padding: 18px; font-size: 16px; font-weight: 800; border-radius: 8px; cursor: pointer; text-transform: uppercase; transition: 0.3s; margin-top: 15px; letter-spacing: 1px; }
 .btn-submit:hover { background: #d95d16; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(243, 111, 33, 0.25); }
@@ -245,9 +248,12 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
     margin: 0 auto;
 }
 
+/* Мобильная версия с выравниванием по левому краю */
 @media (max-width: 480px) {
-    .qty-row { flex-direction: column; align-items: stretch; gap: 10px; }
-    .qty-number { width: 100%; text-align: left; }
+    .qty-row { flex-direction: column; align-items: stretch; gap: 15px; }
+    .qty-input-wrapper { width: 100%; align-items: stretch; }
+    .qty-number { width: 100%; text-align: left; padding-left: 15px; }
+    .qty-hint { text-align: left; padding-left: 5px; width: 100%; }
     .price-value { font-size: 32px; }
     .calc-container { padding-bottom: 20px; }
 }
@@ -256,7 +262,7 @@ $t = isset($calc_lang[$l]) ? $calc_lang[$l] : $calc_lang['et'];
 <script>
 function updatePrice() {
     let qty = parseInt(document.getElementById('q_input').value);
-    if (isNaN(qty) || qty < 1) qty = 1;
+    if (isNaN(qty) || qty < 10) qty = 10;
 
     const formaatElem = document.getElementById('formaat');
     const formatType = formaatElem.value; // 'A65_A5' или 'A4'
@@ -306,7 +312,7 @@ function updatePrice() {
     const finalDisplay = totalPrice.toFixed(2);
     document.getElementById('final_price').innerText = finalDisplay;
 
-    // Формируем данные для заказа (на эстонском, чтобы в админке было понятно)
+    // Формируем данные для заказа
     const formatName = formaatElem.options[formaatElem.selectedIndex].getAttribute('data-name');
     const voltElem = document.getElementById('volt');
     const voltName = voltElem.options[voltElem.selectedIndex].getAttribute('data-name');
@@ -333,12 +339,6 @@ document.querySelectorAll('input[name="paber"]').forEach(radio => {
     radio.addEventListener('change', updatePrice);
 });
 document.getElementById('volt').addEventListener('change', updatePrice);
-
-document.getElementById('showOrder').addEventListener('click', function() {
-    this.style.display = 'none';
-    document.getElementById('orderForm').style.display = 'block';
-    updatePrice();
-});
 
 // Инициализация
 updatePrice();
