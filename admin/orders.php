@@ -1,35 +1,34 @@
 <?php
 session_start();
-require_once '../includes/config.php';
+require_once '../includes/config.php'; // Убедись, что тут используется $pdo
 
-// Проверка авторизации
 if (!isset($_SESSION['logged_in'])) { header("Location: login.php"); exit; }
 
-// Удаление заказа
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-    $conn->query("DELETE FROM orders WHERE id = $id");
+    $stmt = $pdo->prepare("DELETE FROM orders WHERE id = :id");
+    $stmt->execute(['id' => $id]);
     header("Location: admin.php?page=orders&success=deleted");
     exit;
 }
 
-// Получаем список заказов (самые свежие сверху)
 $sql = "SELECT o.*, s.title as service_name 
         FROM orders o 
         LEFT JOIN services s ON o.service_id = s.id 
         ORDER BY o.order_date DESC";
-$res = $conn->query($sql);
+$stmt = $pdo->query($sql);
+$orders = $stmt->fetchAll();
 ?>
 
 <div class="orders-container">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <h2><i class="fas fa-shopping-cart"></i> Uued Tellimused</h2>
         <span style="background: #f36f21; color: white; padding: 5px 15px; border-radius: 20px; font-size: 14px;">
-            Kokku: <?= $res->num_rows ?> tellimust
+            Kokku: <?= count($orders) ?> tellimust
         </span>
     </div>
 
-    <?php if ($res->num_rows > 0): ?>
+    <?php if (count($orders) > 0): ?>
         <div class="table-responsive">
             <table class="orders-table">
                 <thead>
@@ -45,11 +44,11 @@ $res = $conn->query($sql);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($o = $res->fetch_assoc()): ?>
+                    <?php foreach($orders as $o): ?>
                         <tr>
                             <td>#<?= $o['id'] ?></td>
                             <td><?= date('d.m.Y H:i', strtotime($o['order_date'])) ?></td>
-                            <td style="font-weight: bold; color: #333;"><?= htmlspecialchars($o['service_name']) ?></td>
+                            <td style="font-weight: bold; color: #333;"><?= htmlspecialchars($o['service_name'] ?? 'Toode kustutatud') ?></td>
                             <td>
                                 <span class="badge-info"><?= $o['quantity'] ?> tk</span><br>
                                 <small style="color: #888;"><?= htmlspecialchars($o['paper_type']) ?></small>
@@ -77,7 +76,7 @@ $res = $conn->query($sql);
                                 </td>
                             </tr>
                         <?php endif; ?>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
         </div>

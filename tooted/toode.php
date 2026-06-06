@@ -15,9 +15,11 @@ if (!isset($lang)) {
 include '../includes/header.php'; 
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-// Берем все данные
-$res = $conn->query("SELECT * FROM services WHERE id = $id");
-$s = $res->fetch_assoc();
+
+// --- ПЕРЕВОД НА PDO С ЗАЩИТОЙ ---
+$stmt = $pdo->prepare("SELECT * FROM services WHERE id = :id");
+$stmt->execute(['id' => $id]);
+$s = $stmt->fetch();
 
 if (!$s) {
     // Безопасный вывод: если перевода нет, пишем по-эстонски

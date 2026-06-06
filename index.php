@@ -17,13 +17,14 @@ if (!isset($lang)) {
     ];
 }
 
-// Функция для получения настроек, чтобы не было ошибок
+// Функция для получения настроек (переведена на PDO)
 if (!function_exists('get_setting')) {
     function get_setting($key) {
-        global $conn;
-        $res = $conn->query("SELECT config_value FROM settings WHERE config_key = '$key'");
-        if ($res && $res->num_rows > 0) {
-            $row = $res->fetch_assoc();
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT config_value FROM settings WHERE config_key = :key");
+        $stmt->execute(['key' => $key]);
+        $row = $stmt->fetch();
+        if ($row) {
             return $row['config_value'];
         }
         return '';
@@ -32,12 +33,15 @@ if (!function_exists('get_setting')) {
 
 include 'includes/header.php'; 
 
-// Берем слайды ТОЛЬКО для текущего языка сайта
-$slides_res = $conn->query("SELECT * FROM slider WHERE lang = '$current_lang'");
+// Берем слайды ТОЛЬКО для текущего языка сайта (PDO подготовленный запрос)
+$stmt_slides = $pdo->prepare("SELECT * FROM slider WHERE lang = :lang");
+$stmt_slides->execute(['lang' => $current_lang]);
+$slides_res = $stmt_slides->fetchAll();
 
 // Если клиент переключил на финский, а финских слайдов еще нет, показываем эстонские
-if ($slides_res->num_rows == 0) {
-    $slides_res = $conn->query("SELECT * FROM slider WHERE lang = 'et'");
+if (count($slides_res) == 0) {
+    $stmt_slides_et = $pdo->query("SELECT * FROM slider WHERE lang = 'et'");
+    $slides_res = $stmt_slides_et->fetchAll();
 }
 ?>
 
@@ -48,8 +52,8 @@ if ($slides_res->num_rows == 0) {
            <div class="slides-container">
                     <?php 
                     $active_class = "active";
-                    if ($slides_res && $slides_res->num_rows > 0):
-                        while($slide = $slides_res->fetch_assoc()): 
+                    if ($slides_res && count($slides_res) > 0):
+                        foreach($slides_res as $slide): 
                             
                             // УМНАЯ ЛОГИКА ДЛЯ СЛАЙДЕРА
                             $lang_suffix = ($current_lang == 'et') ? '' : '_' . $current_lang;
@@ -72,12 +76,12 @@ if ($slides_res->num_rows == 0) {
                             $z_index = ($active_class == "active") ? "5" : "1";
                             $p_events = ($active_class == "active") ? "auto" : "none";
                     ?>
-                       <a href="<?= $f_link ?>" class="slide-item <?= $active_class ?>" style="background-image: url('img/<?= htmlspecialchars($slide['image_url']) ?>'); z-index: <?= $z_index ?>; pointer-events: <?= $p_events ?>;">
+                       <a href="<?= $f_link ?>" class="slide-item <?= $active_class ?>" style="background-image: url('img/<?= htmlspecialchars($display_img) ?>'); z-index: <?= $z_index ?>; pointer-events: <?= $p_events ?>;">
                            <div class="slide-overlay"></div>
                         </a>
                     <?php 
                         $active_class = ""; 
-                        endwhile; 
+                        endforeach; 
                     endif; 
                     ?>
                 </div>
@@ -126,10 +130,12 @@ if ($slides_res->num_rows == 0) {
 
 <div class="cards-grid">
                 <?php 
-                $avaleht_tooted = $conn->query("SELECT * FROM services WHERE is_visible = 1 ORDER BY id DESC LIMIT 6");
+                // Выводим товары через PDO
+                $stmt_tooted = $pdo->query("SELECT * FROM services WHERE is_visible = 1 ORDER BY id DESC LIMIT 6");
+                $avaleht_tooted = $stmt_tooted->fetchAll();
                 
-                if ($avaleht_tooted && $avaleht_tooted->num_rows > 0): 
-                    while($service = $avaleht_tooted->fetch_assoc()): 
+                if ($avaleht_tooted && count($avaleht_tooted) > 0): 
+                    foreach($avaleht_tooted as $service): 
                         
                         // УМНАЯ ЛОГИКА ДЛЯ ТОВАРОВ
                         $lang_suffix = ($current_lang == 'et') ? '' : '_' . $current_lang;
@@ -149,7 +155,7 @@ if ($slides_res->num_rows == 0) {
                         </div>
                     </a>
                 <?php 
-                    endwhile; 
+                    endforeach; 
                 else: 
                 ?>
                     <p style="text-align:center; color:#888; grid-column: 1/-1; padding: 40px;"><?= htmlspecialchars($lang['no_products']) ?></p>
@@ -276,13 +282,13 @@ body { background: #fcfcfc; }
 .image-wrapper img { 
     width: 100%; 
     height: 100%; 
-    object-fit: cover; /* МАГИЯ ЗДЕСЬ: Картинка заполняет блок без белых полей! */
+    object-fit: cover; 
     display: block;
     transition: transform 0.5s ease; 
 }
 
 .modern-card:hover .image-wrapper img { 
-    transform: scale(1.05); /* Легкое увеличение картинки при наведении */
+    transform: scale(1.05); 
 }
 
 .card-info {
@@ -318,13 +324,9 @@ body { background: #fcfcfc; }
 .send-btn { width: 100%; background: #f36f21; color: white; border: none; padding: 18px; font-weight: 800; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; }
 .send-btn:hover { background: #d95d16; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(243, 111, 33, 0.25); }
 
-
-/* === НАША НОВАЯ МОБИЛЬНАЯ АДАПТАЦИЯ (ТЕЛЕФОНЫ) === */
+/* МОБИЛЬНАЯ АДАПТАЦИЯ */
 @media (max-width: 768px) {
-    /* Скрываем слайдер на телефоне */
     .hero-wrapper { display: none; }
-
-    /* Делаем блок "умным", чтобы он сам центрировал текст по вертикали */
     .section-grey { 
         min-height: 60vh;
         display: flex;
@@ -335,27 +337,18 @@ body { background: #fcfcfc; }
         background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); 
         border-bottom: 1px solid #e2e8f0; 
     } 
-
     .about-content { width: 100%; text-align: center; }
-    
     .main-title { 
         font-size: 2.2rem; 
         line-height: 1.2;
         color: #1a202c; 
         margin-bottom: 15px;
     }
-
     .accent-line { width: 60px; margin: 0 auto 25px auto; }
-    
     .description { font-size: 1.1rem; line-height: 1.6; color: #4a5568; padding: 0 10px; }
-
     .section-white { padding: 60px 0; }
-    
-    /* ТОВАРЫ ПО 1 В РЯД НА ТЕЛЕФОНЕ */
     .cards-grid { grid-template-columns: 1fr !important; gap: 20px; }
     .image-wrapper { height: 240px; }
-
-    /* ФОРМА НА МОБИЛЬНОМ */
     .form-inputs { grid-template-columns: 1fr; gap: 0; }
     .query-container { padding: 35px 20px; border-radius: 12px; }
     .query-title { font-size: 1.6rem; line-height: 1.3; margin-bottom: 25px; }

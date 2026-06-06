@@ -1,26 +1,39 @@
 <?php
 session_start();
-require_once '../includes/config.php';
+// Проверка авторизации
+if (!isset($_SESSION['logged_in'])) { exit; }
+
+require_once '../includes/config.php'; // Используем $pdo
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $link = mysqli_real_escape_string($conn, $_POST['link']);
+    // Безопасная очистка ссылки
+    $link = strip_tags($_POST['link']);
     
-    // Смотрим, какой язык сейчас включен в админке
-    $lang = isset($_SESSION['edit_lang']) ? $_SESSION['edit_lang'] : 'et';
+    // Определяем язык из сессии
+    $lang = $_SESSION['edit_lang'] ?? 'et';
     
-    $image_url = "";
+    $image_name = "";
+    
+    // Безопасная обработка файла
     if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_name = time() . "_" . basename($_FILES['image_url']['name']);
-        if (move_uploaded_file($_FILES['image_url']['tmp_name'], "../img/" . $image_name)) {
-            $image_url = $image_name;
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['image_url']['name'], PATHINFO_EXTENSION));
+        
+        if (in_array($ext, $allowed)) {
+            $image_name = uniqid() . '_' . time() . '.' . $ext;
+            if (move_uploaded_file($_FILES['image_url']['tmp_name'], "../img/" . $image_name)) {
+                
+                // Вставка данных через PDO
+                $stmt = $pdo->prepare("INSERT INTO slider (image_url, link, lang) VALUES (:img, :link, :lang)");
+                $stmt->execute([
+                    'img'  => $image_name,
+                    'link' => $link,
+                    'lang' => $lang
+                ]);
+            }
         }
     }
-
-    if ($image_url) {
-        // Создаем слайд с привязкой к конкретному языку!
-        $sql = "INSERT INTO slider (image_url, link, lang) VALUES ('$image_url', '$link', '$lang')";
-        mysqli_query($conn, $sql);
-    }
+    
     header("Location: admin.php?page=avaleht");
     exit;
 }

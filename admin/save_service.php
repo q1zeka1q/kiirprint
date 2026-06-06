@@ -1,48 +1,65 @@
 <?php
 session_start();
-require_once '../includes/config.php';
+if (!isset($_SESSION['logged_in'])) { exit; }
 
-// Проверяем, какой язык сейчас выбран в админке
-$edit_lang = isset($_SESSION['edit_lang']) ? $_SESSION['edit_lang'] : 'et';
+require_once '../includes/config.php'; 
+require_once '../includes/htmlpurifier/library/HTMLPurifier.auto.php';
+
+$config = HTMLPurifier_Config::createDefault();
+$purifier = new HTMLPurifier($config);
+
+$edit_lang = $_SESSION['edit_lang'] ?? 'et';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Получаем данные из формы
-    $title_input = mysqli_real_escape_string($conn, $_POST['title']);
-    $description_input = mysqli_real_escape_string($conn, $_POST['description']);
-    $link_url = mysqli_real_escape_string($conn, $_POST['link_url']);
+    // Безопасная очистка данных
+    $title_input = strip_tags($_POST['title']);
+    $description_input = $purifier->purify($_POST['description']); 
+    $link_url = strip_tags($_POST['link_url']);
     $price = !empty($_POST['price']) ? (float)$_POST['price'] : 0;
     
-    // Определяем, в какие колонки сохранять текст
     $col_title = ($edit_lang == 'et') ? 'title' : 'title_' . $edit_lang;
     $col_desc = ($edit_lang == 'et') ? 'description' : 'description_' . $edit_lang;
 
-    // Обработка картинки (она ОДНА для всех языков)
-    $image_url = "";
+    $image_name = "";
     if (isset($_FILES['image_url']) && $_FILES['image_url']['error'] == 0) {
-        $image_name = time() . "_" . basename($_FILES['image_url']['name']);
-        if (move_uploaded_file($_FILES['image_url']['tmp_name'], "../img/" . $image_name)) {
-            $image_url = $image_name;
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        $ext = strtolower(pathinfo($_FILES['image_url']['name'], PATHINFO_EXTENSION));
+        
+        if (in_array($ext, $allowed)) {
+            $image_name = uniqid() . '.' . $ext;
+            move_uploaded_file($_FILES['image_url']['tmp_name'], "../img/" . $image_name);
         }
     }
-
-    // Если мы создаем товар НЕ на эстонском, базовые поля title и description не могут быть NULL, 
-    // поэтому запишем туда тот же текст для страховки.
-    $base_title = ($edit_lang == 'et') ? $title_input : $title_input; 
-    $base_desc = ($edit_lang == 'et') ? $description_input : $description_input;
-
     if ($edit_lang == 'et') {
         $sql = "INSERT INTO services (title, description, image_url, link_url, price) 
-                VALUES ('$title_input', '$description_input', '$image_url', '$link_url', '$price')";
+                VALUES (:title, :desc, :img, :link, :price)";
+        $params = [
+            'title' => $title_input,
+            'desc'  => $description_input,
+            'img'   => $image_name,
+            'link'  => $link_url,
+            'price' => $price
+        ];
     } else {
         $sql = "INSERT INTO services (title, description, $col_title, $col_desc, image_url, link_url, price) 
-                VALUES ('$base_title', '$base_desc', '$title_input', '$description_input', '$image_url', '$link_url', '$price')";
+                VALUES (:title, :desc, :title_lang, :desc_lang, :img, :link, :price)";
+        $params = [
+            'title'      => $title_input,
+            'desc'       => $description_input,
+            'title_lang' => $title_input,
+            'desc_lang'  => $description_input,
+            'img'        => $image_name,
+            'link'       => $link_url,
+            'price'      => $price
+        ];
     }
 
-    if (mysqli_query($conn, $sql)) {
+    $stmt = $pdo->prepare($sql);
+    if ($stmt->execute($params)) {
         header("Location: admin.php?page=services");
-        exit; 
+        exit;
     } else {
-        echo "Viga: " . mysqli_error($conn);
+        die("Viga andmete salvestamisel.");
     }
 }
 ?>

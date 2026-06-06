@@ -21,7 +21,9 @@ if (!isset($lang)) {
 
 include 'includes/header.php'; 
 
-$services_res = $conn->query("SELECT * FROM services WHERE is_visible = 1 ORDER BY id DESC");
+// --- ПЕРЕВОД НА PDO ---
+$stmt_services = $pdo->query("SELECT * FROM services WHERE is_visible = 1 ORDER BY id DESC");
+$services_res = $stmt_services->fetchAll();
 ?>
 
 <main class="main-content">
@@ -42,8 +44,8 @@ $services_res = $conn->query("SELECT * FROM services WHERE is_visible = 1 ORDER 
         <div class="container">
             <div class="cards-grid">
                 
-                <?php if ($services_res && $services_res->num_rows > 0): ?>
-                    <?php while($service = $services_res->fetch_assoc()): 
+                <?php if ($services_res && count($services_res) > 0): ?>
+                    <?php foreach($services_res as $service): 
                         
                         // --- УМНАЯ ЛОГИКА ДЛЯ ТОВАРОВ ---
                         $lang_suffix = ($current_lang == 'et') ? '' : '_' . $current_lang;
@@ -66,7 +68,7 @@ $services_res = $conn->query("SELECT * FROM services WHERE is_visible = 1 ORDER 
                             </div>
                         </a>
 
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
                     <p style="text-align:center; color:#888; grid-column: 1/-1; padding: 40px;"><?= htmlspecialchars($lang['no_products']) ?></p>
                 <?php endif; ?>

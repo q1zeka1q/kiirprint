@@ -1,18 +1,24 @@
 <?php
-// Проверь этот путь! Если файл в папке admin, то до includes нужно выйти на уровень вверх (../)
-require_once '../includes/config.php';
+session_start();
+// Проверка авторизации
+if (!isset($_SESSION['logged_in'])) { exit; }
+
+require_once '../includes/config.php'; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['save_settings'])) {
-    foreach ($_POST as $key => $value) {
-        if ($key == 'save_settings') continue;
+    
+    $sql = "INSERT INTO settings (config_key, config_value) 
+            VALUES (:key, :val) 
+            ON DUPLICATE KEY UPDATE config_value = :val";
+    $stmt = $pdo->prepare($sql);
 
-        $safe_key = mysqli_real_escape_string($conn, $key);
-        $safe_value = mysqli_real_escape_string($conn, $value);
-        
-        // Этот запрос обновит существующие или создаст новые записи
-        $conn->query("INSERT INTO settings (config_key, config_value) 
-                      VALUES ('$safe_key', '$safe_value') 
-                      ON DUPLICATE KEY UPDATE config_value = '$safe_value'");
+    foreach ($_POST as $key => $value) {
+        if ($key === 'save_settings') continue;
+
+        $stmt->execute([
+            'key' => $key,
+            'val' => $value // PDO сам позаботится о безопасности, эскейпинг не нужен
+        ]);
     }
 }
 
