@@ -19,6 +19,7 @@ $host = 'localhost';
 $db   = 'kiirprint_db';
 $user = 'root';
 $pass = '';
+$charset = 'utf8mb4'; // Установили кодировку
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
@@ -32,7 +33,6 @@ try {
 } catch (\PDOException $e) {
     die("Andmebaasi ühendus ebaõnnestus: " . $e->getMessage());
 }
-
 function get_setting($key) {
     global $pdo; 
     

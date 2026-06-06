@@ -21,61 +21,72 @@ $edit_lang = $_SESSION['edit_lang'];
 $lang_suffix = ($edit_lang == 'et') ? '' : '_' . $edit_lang;
 // --------------------------------------------------------
 
-// 2. ПОДКЛЮЧЕНИЕ К БАЗЕ
+// 2. ПОДКЛЮЧЕНИЕ К БАЗЕ (PDO)
 if (!file_exists('../includes/config.php')) {
     die("Viga: config.php faili ei leitud!");
 }
 require_once '../includes/config.php';
 
-// Функция для получения настроек, чтобы не было ошибок
+// --- ПОДКЛЮЧАЕМ ЗАЩИТУ ОТ XSS (HTMLPurifier) ---
+// Рецензент требовал эту библиотеку для фильтрации HTML из CKEditor
+require_once '../includes/htmlpurifier/library/HTMLPurifier.auto.php';
+$config = HTMLPurifier_Config::createDefault();
+$purifier = new HTMLPurifier($config);
+// -----------------------------------------------
+
+// Функция для получения настроек (PDO)
 if (!function_exists('get_setting')) {
     function get_setting($key) {
-        global $conn;
-        $res = $conn->query("SELECT config_value FROM settings WHERE config_key = '$key'");
-        if ($res && $res->num_rows > 0) {
-            $row = $res->fetch_assoc();
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT config_value FROM settings WHERE config_key = :key");
+        $stmt->execute(['key' => $key]);
+        if ($row = $stmt->fetch()) {
             return $row['config_value'];
         }
         return '';
     }
 }
 
-// СОХРАНЕНИЕ НАСТРОЕК
+// СОХРАНЕНИЕ НАСТРОЕК (БЕЗОПАСНО ЧЕРЕЗ PDO И HTMLPurifier)
 if (isset($_POST['save_settings'])) {
-    $home_title = mysqli_real_escape_string($conn, $_POST['home_title']);
-    $home_subtitle = mysqli_real_escape_string($conn, $_POST['home_subtitle']);
-    $footer_email = mysqli_real_escape_string($conn, $_POST['footer_email']);
-    $footer_phone = mysqli_real_escape_string($conn, $_POST['footer_phone']);
-    $footer_about = mysqli_real_escape_string($conn, $_POST['footer_about']);
-    $footer_address = mysqli_real_escape_string($conn, $_POST['footer_address']);
     
-    // Новые поля для контактов
-    $contact_company = mysqli_real_escape_string($conn, $_POST['contact_company']);
-    $contact_reg = mysqli_real_escape_string($conn, $_POST['contact_reg']);
-    $contact_kmk = mysqli_real_escape_string($conn, $_POST['contact_kmk']);
-    $contact_bank = mysqli_real_escape_string($conn, $_POST['contact_bank']);
-    $contact_swift = mysqli_real_escape_string($conn, $_POST['contact_swift']);
-    $contact_hours = mysqli_real_escape_string($conn, $_POST['contact_hours']);
+    // Очищаем обычные строки от любых тегов (strip_tags)
+    $home_title = strip_tags($_POST['home_title']);
+    $footer_email = strip_tags($_POST['footer_email']);
+    $footer_phone = strip_tags($_POST['footer_phone']);
+    $footer_address = strip_tags($_POST['footer_address']);
+    $contact_company = strip_tags($_POST['contact_company']);
+    $contact_reg = strip_tags($_POST['contact_reg']);
+    $contact_kmk = strip_tags($_POST['contact_kmk']);
+    $contact_bank = strip_tags($_POST['contact_bank']);
+    $contact_swift = strip_tags($_POST['contact_swift']);
+    $contact_hours = strip_tags($_POST['contact_hours']);
+    
+    // Тексты, где может быть форматирование, прогоняем через HTMLPurifier (защита от XSS)
+    $home_subtitle = $purifier->purify($_POST['home_subtitle']);
+    $footer_about = $purifier->purify($_POST['footer_about']);
 
-    // Умная функция: если ключа нет в базе, она его создаст, если есть - обновит!
+    // Умная функция на PDO: безопасное сохранение
     function save_or_update_setting($key, $val) {
-        global $conn;
-        $check = $conn->query("SELECT * FROM settings WHERE config_key = '$key'");
-        if ($check->num_rows > 0) {
-            $conn->query("UPDATE settings SET config_value = '$val' WHERE config_key = '$key'");
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT config_value FROM settings WHERE config_key = :key");
+        $stmt->execute(['key' => $key]);
+        
+        if ($stmt->fetch()) {
+            $upd = $pdo->prepare("UPDATE settings SET config_value = :val WHERE config_key = :key");
+            $upd->execute(['val' => $val, 'key' => $key]);
         } else {
-            $conn->query("INSERT INTO settings (config_key, config_value) VALUES ('$key', '$val')");
+            $ins = $pdo->prepare("INSERT INTO settings (config_key, config_value) VALUES (:key, :val)");
+            $ins->execute(['key' => $key, 'val' => $val]);
         }
     }
 
-    // Сохраняем переводимые тексты с суффиксом (например: home_title_ru)
     save_or_update_setting('home_title' . $lang_suffix, $home_title);
     save_or_update_setting('home_subtitle' . $lang_suffix, $home_subtitle);
     save_or_update_setting('footer_about' . $lang_suffix, $footer_about);
     save_or_update_setting('footer_address' . $lang_suffix, $footer_address);
     save_or_update_setting('contact_hours' . $lang_suffix, $contact_hours);
 
-    // Сохраняем общие данные (email, телефоны, рег. коды), они не зависят от языка
     save_or_update_setting('footer_email', $footer_email);
     save_or_update_setting('footer_phone', $footer_phone);
     save_or_update_setting('contact_company', $contact_company);
@@ -255,12 +266,14 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
         </thead>
         <tbody>
             <?php 
-            $res = $conn->query("SELECT * FROM services ORDER BY id DESC");
+            $stmt = $pdo->query("SELECT * FROM services ORDER BY id DESC");
+            $services = $stmt->fetchAll();
+            
             // Умные колонки для вывода
             $title_col = ($edit_lang == 'et') ? 'title' : 'title_' . $edit_lang;
             $desc_col = ($edit_lang == 'et') ? 'description' : 'description_' . $edit_lang;
 
-            while($s = $res->fetch_assoc()): 
+            foreach($services as $s): 
                 // Если перевода еще нет, показываем эстонский оригинал
                 $display_title = !empty($s[$title_col]) ? $s[$title_col] : $s['title'];
                 $display_desc = !empty($s[$desc_col]) ? $s[$desc_col] : $s['description'];
@@ -273,7 +286,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
                     <td><strong><?= htmlspecialchars($display_title) ?></strong></td>
                     <td class="desc-col">
                         <span style="color: #718096; font-size: 13px;">
-                            <?= mb_strimwidth(htmlspecialchars($display_desc), 0, 60, "...") ?>
+                            <?= mb_strimwidth(strip_tags($display_desc), 0, 60, "...") ?>
                         </span>
                     </td>
                     <td><strong style="color: var(--main-orange); font-size: 15px;"><?= number_format($s['price'], 2) ?> €</strong></td>
@@ -287,7 +300,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
                         <a href="delete_service.php?id=<?= $s['id'] ?>" class="delete" onclick="return confirm('Kas oled kindel, et soovid kustutada?')" title="Kustuta"><i class="fas fa-trash"></i></a>
                     </td>
                 </tr>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         </tbody>
     </table>
 </div>
@@ -297,12 +310,14 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
     
     <?php
     $where_clauses = [];
+    $params = [];
     $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
     $status_filter = isset($_GET['status_filter']) ? $_GET['status_filter'] : 'all';
 
     if (!empty($search_query)) {
-        $safe_search = $conn->real_escape_string($search_query);
-        $where_clauses[] = "(o.id = '$safe_search' OR o.client_name LIKE '%$safe_search%' OR o.client_email LIKE '%$safe_search%' OR o.client_phone LIKE '%$safe_search%')";
+        $where_clauses[] = "(o.id = :search_id OR o.client_name LIKE :search_like OR o.client_email LIKE :search_like OR o.client_phone LIKE :search_like)";
+        $params['search_id'] = $search_query;
+        $params['search_like'] = '%' . $search_query . '%';
     }
     if ($status_filter === 'uus') {
         $where_clauses[] = "(o.status IS NULL OR o.status != 'valmis')";
@@ -316,7 +331,9 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
     }
 
     $sql = "SELECT o.*, s.title as service_name FROM orders o LEFT JOIN services s ON o.service_id = s.id $where_sql ORDER BY o.order_date DESC";
-    $res = $conn->query($sql);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $orders = $stmt->fetchAll();
     ?>
 
     <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 25px;">
@@ -342,7 +359,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
         </form>
     </div>
 
-    <?php if ($res && $res->num_rows > 0): ?>
+    <?php if (count($orders) > 0): ?>
         <table>
             <thead>
                 <tr>
@@ -355,7 +372,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
                 </tr>
             </thead>
                 <tbody>
-                    <?php while($o = $res->fetch_assoc()): 
+                    <?php foreach($orders as $o): 
                         $is_ready = ($o['status'] == 'valmis');
                     ?>
                         <tr>
@@ -388,7 +405,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
                                 <a href="delete_order.php?id=<?= $o['id'] ?>" class="delete" onclick="return confirm('Kustutada?')" title="Kustuta"><i class="fas fa-trash"></i></a>
                             </td>
                         </tr>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 </tbody>
         </table>
     <?php else: ?>
@@ -405,11 +422,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
 
 <?php elseif ($page == 'prices'): ?>
 <?php
-    $services_list = $conn->query("SELECT id, title FROM services ORDER BY title ASC");
+    $services_list = $pdo->query("SELECT id, title FROM services ORDER BY title ASC")->fetchAll();
     $selected_service_id = isset($_GET['service_id']) ? intval($_GET['service_id']) : 0;
-    if ($selected_service_id == 0) {
-        $first_service = $conn->query("SELECT id FROM services LIMIT 1")->fetch_assoc();
-        $selected_service_id = $first_service ? $first_service['id'] : 0;
+    
+    if ($selected_service_id == 0 && count($services_list) > 0) {
+        $selected_service_id = $services_list[0]['id'];
     }
     ?>
 
@@ -420,13 +437,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
         <form method="GET" id="serviceFilter" style="margin: 0;">
             <input type="hidden" name="page" value="prices">
             <select name="service_id" onchange="this.form.submit()" style="min-width: 250px; padding: 10px;">
-                <?php 
-                $services_list->data_seek(0);
-                while($sl = $services_list->fetch_assoc()): ?>
+                <?php foreach($services_list as $sl): ?>
                     <option value="<?= $sl['id'] ?>" <?= $selected_service_id == $sl['id'] ? 'selected' : '' ?>>
                         <?= htmlspecialchars($sl['title']) ?>
                     </option>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </select>
         </form>
         <button class="btn btn-green" onclick="toggleForm('form-price')" style="margin-left: auto;"><i class="fas fa-plus"></i> Lisa hind</button>
@@ -448,9 +463,12 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
         </thead>
         <tbody>
             <?php 
-            $res = $conn->query("SELECT * FROM prices WHERE service_id = $selected_service_id ORDER BY kogus_alates ASC");
-            if ($res && $res->num_rows > 0):
-                while($p = $res->fetch_assoc()): ?>
+            $stmt = $pdo->prepare("SELECT * FROM prices WHERE service_id = :sid ORDER BY kogus_alates ASC");
+            $stmt->execute(['sid' => $selected_service_id]);
+            $prices = $stmt->fetchAll();
+            
+            if (count($prices) > 0):
+                foreach($prices as $p): ?>
                     <tr>
                         <td><strong><?= $p['kogus_alates'] ?>+</strong></td>
                         <td><?= number_format($p['hind_4_0'], 3) ?> €</td>
@@ -460,7 +478,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
                             <a href="delete_price.php?id=<?= $p['id'] ?>" class="delete" onclick="return confirm('Kustutada?')"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
-                <?php endwhile; 
+                <?php endforeach; 
             else: ?>
                 <tr><td colspan="4" style="text-align:center; padding: 30px; color: #a0aec0;">Selle toote jaoks pole veel hindu sisestatud.</td></tr>
             <?php endif; ?>
@@ -479,10 +497,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
 <table>
         <tr><th>Pilt (<?= strtoupper($edit_lang) ?>)</th><th>Link</th><th style="text-align:right">Tegevus</th></tr>
         <?php 
-        // Выбираем слайды ТОЛЬКО для текущего языка!
-        $res = $conn->query("SELECT * FROM slider WHERE lang = '$edit_lang'");
+        $stmt = $pdo->prepare("SELECT * FROM slider WHERE lang = :lang");
+        $stmt->execute(['lang' => $edit_lang]);
+        $slides = $stmt->fetchAll();
 
-        while($sl = $res->fetch_assoc()): 
+        foreach($slides as $sl): 
         ?>
             <tr>
                 <td><img src="../img/<?= htmlspecialchars($sl['image_url']) ?>" width="120" style="border-radius: 6px;"></td>
@@ -492,7 +511,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
                     <a href="delete_slide.php?id=<?= $sl['id'] ?>" class="delete" onclick="return confirm('Kustutada?')" title="Kustuta"><i class="fas fa-trash"></i></a>
                 </td>
             </tr>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </table>
 
     <hr style="margin: 40px 0; border:0; border-top: 2px solid #edf2f7;">
@@ -552,9 +571,11 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
 <?php elseif ($page == 'queries'): ?>
 <h2><i class="fas fa-envelope-open-text" style="color: var(--main-orange); margin-right: 10px;"></i> Saabunud päringud</h2>
     <?php 
-    $res = $conn->query("SELECT * FROM paringud ORDER BY is_read ASC, kuupaev DESC");
-    if($res && $res->num_rows > 0):
-        while($q = $res->fetch_assoc()): 
+    $stmt = $pdo->query("SELECT * FROM paringud ORDER BY is_read ASC, kuupaev DESC");
+    $queries = $stmt->fetchAll();
+    
+    if(count($queries) > 0):
+        foreach($queries as $q): 
             $isRead = ($q['is_read'] == 1); ?>
             <div style="background: <?= $isRead ? '#f8fafc' : '#fff' ?>; border: 1px solid <?= $isRead ? '#edf2f7' : '#e2e8f0' ?>; padding: 25px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid <?= $isRead ? '#cbd5e0' : 'var(--main-orange)' ?>; box-shadow: <?= $isRead ? 'none' : '0 2px 10px rgba(0,0,0,0.03)' ?>;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -574,7 +595,7 @@ $page = isset($_GET['page']) ? $_GET['page'] : 'services';
                     <?= nl2br(htmlspecialchars($q['tekst'])) ?>
                 </div>
             </div>
-        <?php endwhile; 
+        <?php endforeach; 
     else: ?>
         <p style="text-align:center; padding: 40px; color: #a0aec0;">Päringuid ei ole.</p>
     <?php endif; ?>
